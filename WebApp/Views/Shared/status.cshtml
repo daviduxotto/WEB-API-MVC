@@ -1,0 +1,21 @@
+﻿
+<ul class="nav navbar-nav navbar-right">
+     @try
+     {
+         if (@Session["usuario"].ToString() == "" && @Session["empresa"].ToString() == "" && @Session["sucursal"].ToString() == "")
+         {
+         }
+         else
+         {
+         <li><a>Bienvenido(a)  @Session["usuario"] </a></li>
+         <li> <a>@Session["sucursalDescripcion"] -  @Session["empresaDescripcion"]  </a></li>
+        <li> <a>@Convert.ToDateTime(Session["diatrabajo"]).ToShortDateString() </a></li>
+         }
+
+     }
+     catch { }
+
+
+
+    <li></li>
+</ul>

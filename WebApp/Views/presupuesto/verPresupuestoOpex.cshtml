@@ -1,0 +1,253 @@
+﻿@model List<Entidades.ePresupuesto>
+
+@{
+    ViewBag.Title = "Presupuesto";
+    double subtotal = 0;
+    double total = 0;
+    double[] totales = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+}
+@if (ViewBag.retorno != null)
+{
+    if (Convert.ToInt32(ViewBag.retorno) >= 1)
+    {
+    <div class="alert alert-info">@ViewBag.mensaje</div>
+    }
+    else
+    {
+    <div class="alert alert-warning">@ViewBag.mensaje</div>
+    }
+}
+<table class="table table-sm">
+    <thead class="thead-dark">
+        <tr>
+
+            <th scope="col">Empresa</th>
+            <th scope="col">Unidad De Negocio</th>
+            <th scope="col">Area</th>
+            <th scope="col">Departamento</th>
+            <th scope="col">Tipo Presupuesto</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+           
+            <td>@ViewBag.empresa</td>
+            <td>@ViewBag.estacion</td>
+            <td>@ViewBag.area </td>
+            <td>@ViewBag.departamento</td>
+            <td>@ViewBag.tipopresupuesto</td>
+        </tr>
+    </tbody>
+</table>
+@using (Html.BeginForm("guardarPresupuestoOpex", "presupuesto"))
+{
+
+<div class="form-group">
+    <div class="btn-group">
+        <input type="submit" value="Guardar" class="btn btn-primary" />
+
+        @Html.ActionLink("Ver Informe", "verInformePresupuestoOpex", "presupuesto", "", new { @class = "btn btn-primary" })
+
+
+        @Html.ActionLink("Salir al Menú", "index", "home", "", new { @class = "btn btn-danger" })
+
+    </div>
+</div>
+    <div class="form-horizontal">
+
+        <table id="tabla" class="table table-bordered table-hover display" >  
+            <thead>
+                <tr>
+                    <th class="input-sm " style="font-size:70%;"> CODIGO</th>
+                    <th class="input-sm" style="font-size:70%;">CUENTA CONTABLE</th>
+                    <th class="input-sm "> <div style="width:75px;font-size:80%; "  >ENERO</div></th>
+                    <th class="input-sm "><div style="width:75px;font-size:80%;">FEBRERO</div></th>
+                    <th class="input-sm "><div style="width:75px;font-size:80%;">MARZO</div></th>
+                    <th class="input-sm "><div style="width:75px;font-size:80%;">ABRIL</div></th>
+                    <th class="input-sm "><div style="width:75px;font-size:80%;">MAYO</div></th>
+                    <th class="input-sm "><div style="width:75px;font-size:80%;">JUNIO</div></th>
+                    <th class="input-sm "><div style="width:75px;font-size:80%;">JULIO</div></th>
+                    <th class="input-sm "><div style="width:75px;font-size:80%;">AGOSTO</div></th>
+                    <th class="input-sm "><div style="width:75px;font-size:80%;">SEPTIEMBRE</div></th>
+                    <th class="input-sm "><div style="width:75px;font-size:80%;">OCTUBRE</div></th>
+                    <th class="input-sm "><div style="width:75px;font-size:80%;">NOVIEMBRE</div></th>
+                    <th class="input-sm "><div style="width:75px;font-size:80%;">DICIEMBRE</div></th>
+                     <th class="input-sm "><div style="width:75px;font-size:80%;">SUBTOTAL</div></th>
+                </tr>
+                </thead>
+
+            <tbody>
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    subtotal = Model[i].pres01 + Model[i].pres02 + Model[i].pres03 + Model[i].pres04 + Model[i].pres05 + Model[i].pres06 + Model[i].pres07 + Model[i].pres08 + Model[i].pres09 + Model[i].pres10 + Model[i].pres11 + Model[i].pres12;
+                    total = total + subtotal;
+
+                    totales[1] += Model[i].pres01;
+                    totales[2] += Model[i].pres02;
+                    totales[3] += Model[i].pres03;
+                    totales[4] += Model[i].pres04;
+                    totales[5] += Model[i].pres05;
+                    totales[6] += Model[i].pres06;
+                    totales[7] += Model[i].pres07;
+                    totales[8] += Model[i].pres08;
+                    totales[9] += Model[i].pres09;
+                    totales[10] += Model[i].pres10;
+                    totales[11] += Model[i].pres11;
+                    totales[12] += Model[i].pres12;
+                <tr>
+
+                    <td class="input-sm"  style="font-size:70%;">
+                        @Model[i].CodcuentaContable
+                    </td>
+                    <td class="input-sm"  style="font-size:70%;">
+                        @Model[i].DesccuentaContable
+                    </td>
+                    @Html.EditorFor(model => @Model[i].DesccuentaContable, new { htmlAttributes = new { @class = "hidden" } })
+                    @Html.EditorFor(model => @Model[i].CodcuentaContable, new { htmlAttributes = new { @class = "hidden" } })
+                    <td>
+                        @Html.EditorFor(model => @Model[i].pres01, new { htmlAttributes = new { @class = "form-control input-sm pull-right celda", @style = "text-align:right;font-size:80%;" } })
+                        
+                    </td>
+                    <td>
+                        @Html.EditorFor(model => @Model[i].pres02, new { htmlAttributes = new { @class = "form-control input-sm ", @style = "text-align:right;font-size:80%;" } })
+                    </td>
+                    <td>
+                        @Html.EditorFor(model => @Model[i].pres03, new { htmlAttributes = new { @class = "form-control input-sm ", @style = "text-align:right;font-size:80%;" } })
+                    </td>
+                    <td>
+                        @Html.EditorFor(model => @Model[i].pres04, new { htmlAttributes = new { @class = "form-control input-sm ", @style = "text-align:right;font-size:80%;" } })
+                    </td>
+                    <td>
+                        @Html.EditorFor(model => @Model[i].pres05, new { htmlAttributes = new { @class = "form-control input-sm ", @style = "text-align:right;font-size:80%;" } })
+                    </td>
+                    <td>
+                        @Html.EditorFor(model => @Model[i].pres06, new { htmlAttributes = new { @class = "form-control input-sm ", @style = "text-align:right;font-size:80%;" } })
+                    </td>
+                    <td>
+                        @Html.EditorFor(model => @Model[i].pres07, new { htmlAttributes = new { @class = "form-control input-sm ", @style = "text-align:right;font-size:80%;" } })
+                    </td>
+                    <td>
+                        @Html.EditorFor(model => @Model[i].pres08, new { htmlAttributes = new { @class = "form-control input-sm ", @style = "text-align:right;font-size:80%;" } })
+                    </td>
+                    <td>
+                        @Html.EditorFor(model => @Model[i].pres09, new { htmlAttributes = new { @class = "form-control input-sm ", @style = "text-align:right;font-size:80%;" } })
+                    </td>
+                    <td>
+                        @Html.EditorFor(model => @Model[i].pres10, new { htmlAttributes = new { @class = "form-control input-sm ", @style = "text-align:right;font-size:80%;" } })
+                    </td>
+                    <td>
+                        @Html.EditorFor(model => @Model[i].pres11, new { htmlAttributes = new { @class = "form-control input-sm ", @style = "text-align:right;font-size:80%;" } })
+                    </td>
+                    <td>
+                        @Html.EditorFor(model => @Model[i].pres12, new { htmlAttributes = new { @class = "form-control input-sm ", @style = "text-align:right;font-size:80%;" } })
+                    </td>
+                    <td style="text-align:right">Q. @subtotal</td>
+
+                </tr>
+                }
+
+                <tr>
+                    <td></td>
+                    <td>TOTAL:</td>
+                    <td style="text-align:right">Q.  @totales[1]</td>
+                    <td style="text-align:right">Q.  @totales[2]</td>
+                    <td style="text-align:right">Q.  @totales[3]</td>
+                    <td style="text-align:right">Q.  @totales[4]</td>
+                    <td style="text-align:right">Q.  @totales[5]</td>
+                    <td style="text-align:right">Q.  @totales[6]</td>
+                    <td style="text-align:right">Q.  @totales[7]</td>
+                    <td style="text-align:right">Q.  @totales[8]</td>
+                    <td style="text-align:right">Q.  @totales[9]</td>
+                    <td style="text-align:right">Q.  @totales[10]</td>
+                    <td style="text-align:right">Q.  @totales[11]</td>
+                    <td style="text-align:right">Q.  @totales[12]</td>         
+                    <td style="text-align:right">Q.  @total</td>
+                </tr>
+            </tbody>
+</table>
+
+
+
+
+        <div class="form-group">
+            <div class="btn-group">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+           
+                    @Html.ActionLink("Ver Informe", "verInformePresupuestoOpex", "presupuesto", "", new { @class = "btn btn-primary" })
+
+           
+                    @Html.ActionLink("Salir al Menú", "index", "home", "", new { @class = "btn btn-danger" })
+             
+            </div>
+        </div>
+    </div>
+}
+
+
+@section scripts
+{
+<script src="~/Scripts/jquery-number.js"></script>
+
+    <script>
+        $(document).ready(function () {
+        
+            $("input").change(function () {
+          
+                var totales = new Array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+                //vamos a rrecorer la tabla
+                $("#tabla tbody tr").each(function (i) {
+                    var subtotal = 0; //unicamente para la columna que se calula
+                    var subtotales = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+                    $(this).children("td").each(function (j) {                       
+                        if (j >= 2 && j <= 13)
+                        {
+                            subtotal = parseFloat(subtotal) + parseFloat($(this).children("input").val());                        
+                            subtotales[j] = parseFloat($(this).children("input").val());                           
+                        }
+                        if(j==14)
+                        {
+                            $(this).html("Q. " + subtotal);
+                            subtotales[j] = parseFloat(subtotal);
+                        }
+                    });
+
+                    if (i < ($("#tabla tbody tr").length -1))
+                    {
+                        totales[2] = parseFloat(totales[2]) + parseFloat(subtotales[2]);
+                        totales[3] = parseFloat(totales[3]) + parseFloat(subtotales[3]);
+                        totales[4] = parseFloat(totales[4]) + parseFloat(subtotales[4]);
+                        totales[5] = parseFloat(totales[5]) + parseFloat(subtotales[5]);
+                        totales[6] = parseFloat(totales[6]) + parseFloat(subtotales[6]);
+                        totales[7] = parseFloat(totales[7]) + parseFloat(subtotales[7]);
+                        totales[8] = parseFloat(totales[8]) + parseFloat(subtotales[8]);
+                        totales[9] = parseFloat(totales[9]) + parseFloat(subtotales[9]);
+                        totales[10] = parseFloat(totales[10]) + parseFloat(subtotales[10]);
+                        totales[11] = parseFloat(totales[11]) + parseFloat(subtotales[11]);
+                        totales[12] = parseFloat(totales[12]) + parseFloat(subtotales[12]);
+                        totales[13] = parseFloat(totales[13]) + parseFloat(subtotales[13]);
+                        totales[14] = parseFloat(totales[14]) + parseFloat(subtotales[14]);
+                    }
+                    else
+                    {
+                     
+                        $(this).find("td").eq(2).html("Q. " + totales[2]);
+                        $(this).find("td").eq(3).html("Q. " + totales[3]);
+                        $(this).find("td").eq(4).html("Q. " + totales[4]);
+                        $(this).find("td").eq(5).html("Q. " + totales[5]);
+                        $(this).find("td").eq(6).html("Q. " + totales[6]);
+                        $(this).find("td").eq(7).html("Q. " + totales[7]);
+                        $(this).find("td").eq(8).html("Q. " + totales[8]);
+                        $(this).find("td").eq(9).html("Q. " + totales[9]);
+                        $(this).find("td").eq(10).html("Q. " + totales[10]);
+                        $(this).find("td").eq(11).html("Q. " + totales[11]);
+                        $(this).find("td").eq(12).html("Q. " + totales[12]);
+                        $(this).find("td").eq(13).html("Q. " + totales[13]);
+                        $(this).find("td").eq(14).html("Q. " + totales[14]);                     
+                    }
+                });
+            });
+
+ 
+        });
+    </script>
+}

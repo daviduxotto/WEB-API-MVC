@@ -1,0 +1,177 @@
+﻿@model Entidades.eEmpleado
+
+@{
+    ViewBag.Title = "entorno";
+}
+
+<h3>Selección entorno para Empleados</h3>
+
+@using (Html.BeginForm("listar", "empleado", FormMethod.Post))
+{
+
+
+    <div class="form-horizontal">
+        
+        <div class="form-group">
+            <label class="control-label col-md-2" for="empresa">Empresa</label>
+            <div class="col-md-4">
+
+                @Html.DropDownListFor(m => m.empresa, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="estacion">Unidad de Negocio</label>
+            <div class="col-md-4">
+                @Html.DropDownListFor(m => m.estacion, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control col-md-4" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="area">Area</label>
+            <div class="col-md-4">
+                @Html.DropDownListFor(m => m.area, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control col-md-4" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="departamento">Departamento</label>
+            <div class="col-md-4">
+                @Html.DropDownListFor(m => m.departamento, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control col-md-4" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Procesar" class="btn btn-primary" />
+                @Html.ActionLink("Regresar", "index", "home", "", new { @class = "btn btn-danger" })
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@section scripts
+{
+
+    <script>
+        $(document).ready(function () {
+            // ----- obtener empresas
+            $.getJSON('/empleado/getEmpresas', null, function (data) {
+                $.each(data, function () {
+                    $('#empresa').append('<option value=' +
+                      this.codigo + '>' + this.descripcion + '</option>');
+                });
+                // ----- obtener sucursales
+               $.getJSON('/empleado/getSucursales', { codEmpresa: $('#empresa').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#estacion').append('<option value=' +
+                          this.codigoSucursal + '>' + this.descripcion+ '</option>');
+                    });
+                   // ----- obtener area por unidad de negocio
+                    $.getJSON('/empleado/getareaxunidadnegocio', { codEmpresa: $('#empresa').val(), codSucursal: $('#estacion').val() }, function (data) {
+                        $.each(data, function () {
+                            $('#area').append('<option value=' +
+                              this.codigo + '>' + this.descripcion + '</option>');
+                        });
+                        // ----- obtener departamento x unidad de negocio x area
+                        $.getJSON('/empleado/getdepartamentoxunidadnegocioxarea', { codEmpresa: $('#empresa').val(), codSucursal: $('#estacion').val(), codArea: $('#area').val() }, function (data) {
+                            $.each(data, function () {
+                                $('#departamento').append('<option value=' +
+                                  this.codigo + '>' + this.descripcion + '</option>');
+                            });
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                            alert('Error al obtener departamento!');
+                        }); // -- fin obtener departamento
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error al obtener area!');
+                    }); // -- fin obtener area
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener sucursales');
+                });
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert('Error al obtener Empresas!');
+            });
+            // ------ fin de carga inicial --------------------------------------------------------------------------
+
+            // ------ obtener sucursales cuando la empresa cambie
+            $('#empresa').change(function () {
+                $('#estacion option').remove();
+                $.getJSON('/empleado/getSucursales', { codEmpresa: $('#empresa').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#estacion').append('<option value=' +
+                          this.codigoSucursal + '>' + this.descripcion + '</option>');
+                    });
+                    $('#area option').remove();
+                    // ----- obtener area por unidad de negocio
+                    $.getJSON('/empleado/getareaxunidadnegocio', { codEmpresa: $('#empresa').val(), codSucursal: $('#estacion').val() }, function (data) {
+                        console.log('cambio de empresa y añadir area');
+                        $.each(data, function () {
+                            $('#area').append('<option value=' +
+                              this.codigo + '>' + this.descripcion + '</option>');
+                        });
+                        $('#departamento option').remove();
+                        // ----- obtener departamento x unidad de negocio x area
+                        $.getJSON('/empleado/getdepartamentoxunidadnegocioxarea', { codEmpresa: $('#empresa').val(), codSucursal: $('#estacion').val(), codArea: $('#area').val() }, function (data) {
+                            $.each(data, function () {
+                                $('#departamento').append('<option value=' +
+                                  this.codigo + '>' + this.descripcion + '</option>');
+                            });
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                            alert('Error al obtener departamento!');
+                        }); // -- fin obtener departamento
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error al obtener area!');
+                    }); // -- fin obtener area
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener sucursales');
+                });
+            });
+
+            // ------ obtener area cuando la sucursal cambie
+            $('#estacion').change(function () {
+                $('#area option').remove();
+                console.log('cambio la estacuib');
+                $.getJSON('/empleado/getareaxunidadnegocio', { codEmpresa: $('#empresa').val(), codSucursal: $('#estacion').val() }, function (data) {
+                    $.each(data, function () {
+
+                        $('#area').append('<option value=' +
+                          this.codigo + '>' + this.descripcion + '</option>');
+                    });
+                    $('#departamento option').remove();
+                    $.getJSON('/empleado/getdepartamentoxunidadnegocioxarea', { codEmpresa: $('#empresa').val(), codSucursal: $('#estacion').val(), codArea: $('#area').val() }, function (data) {
+                        $.each(data, function () {
+                            $('#departamento').append('<option value=' +
+                              this.codigo + '>' + this.descripcion + '</option>');
+                        });
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error al obtener departamento!');
+                    }); // -- fin obtener departamento
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener area');
+                });
+            });
+
+            // ------ obtener departamento cuando el area cambie
+            $('#area').change(function () {
+                $('#departamento option').remove();
+                $.getJSON('/empleado/getdepartamentoxunidadnegocioxarea', { codEmpresa: $('#empresa').val(), codSucursal: $('#estacion').val(), codArea: $('#area').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#departamento').append('<option value=' +
+                          this.codigo + '>' + this.descripcion + '</option>');
+                    });
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener departamento!');
+                }); // -- fin obtener departamento
+            });
+
+
+
+        });
+    </script>
+}
+
+

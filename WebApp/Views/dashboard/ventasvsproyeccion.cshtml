@@ -1,0 +1,88 @@
+﻿
+@{
+    ViewBag.Title = "ventasvsproyeccion";
+}
+
+<h3>Estadistico Ventas vs Proyeccion</h3>
+@section scripts
+{
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        //  corporativo 
+        var ventaGalonesCorporativo = 0;
+        var ventaGalonesProyeccionCorporativo = 0;
+        var ventaGalonesPorcentajeCorporativo = 0;
+        var ventaGalonesPresupuestoCorporativo = 0;
+        // empresa
+        var ventaGalonesOils = 0;
+        var ventaGalonesProyeccionOils = 0;
+        var ventaGalonesPorcentajeOils = 0;
+        var ventaGalonesPresupuestoOils = 0;
+        var ventaGalonesValdemoro = 0;
+        var ventaGalonesProyeccionValdemoro = 0;
+        var ventaGalonesPorcentajeValdemoro = 0;
+        var ventaGalonesPresupuestoValdemoro = 0;
+        // funciones
+        google.charts.load('current', { 'packages': ['gauge'] });
+        google.charts.setOnLoadCallback(drawChartVentaGalonesCorporativo);
+        function cargarTabla() {
+            $.ajax({
+                type: "POST",
+                async: false,
+                url: '/dashboard/infoVentavsPreyeccion',
+                success: function (data) {
+                   
+                    $.each(data, function () {
+                    
+                        ventaGalonesCorporativo = ventaGalonesCorporativo + this.ventaGalones;
+                        ventaGalonesProyeccionCorporativo = ventaGalonesProyeccionCorporativo + this.ventaGalonesProyeccion;      
+                        ventaGalonesPresupuestoCorporativo = ventaGalonesPresupuestoCorporativo + this.ventaGalonesPresupuesto;
+                     
+                    });
+                   ventaGalonesPorcentajeCorporativo = (ventaGalonesCorporativo * 100) / ventaGalonesPresupuestoCorporativo;
+               
+                }
+            })
+        }
+        function drawChartVentaGalonesCorporativo() {
+
+            var dataVentaGalonesCorporativo = google.visualization.arrayToDataTable([
+                ['Label', 'Value'],
+                ['Galones', ventaGalonesPorcentajeCorporativo],
+               // ['Oils Mk', ventaGalonesPorcentajeOils ],
+            //    ['Valdemoro', ventaGalonesPorcentajeValdemoro]
+
+            ]);
+            var formatter = new google.visualization.NumberFormat(
+                { suffix: '%', pattern: '#' }
+            );
+            formatter.format(dataVentaGalonesCorporativo, 1);
+            var optionsVentaGalonesCorporativo = {
+                width: 500, height: 160,
+                greenFrom: 85, greenTo: 100,
+                yellowFrom: 75, yellowTo: 85,
+                minorTicks: 5
+            };
+
+            var chartVentaGalonesCorporativo = new google.visualization.Gauge(document.getElementById('chart_div'));
+            chartVentaGalonesCorporativo.draw(dataVentaGalonesCorporativo, optionsVentaGalonesCorporativo);
+
+     
+        }
+
+        function convertirAmiles(numero) 
+        {
+            return numero / 1000;
+        }
+
+        cargarTabla();
+       
+    </script>
+    }
+    <body>
+        <p>Porcentaje venta de galones vs proyeccion corporativo</p>
+        <div id="chart_div" style="width: 700px; height: 120px;">
+
+        </div>
+
+    </body>

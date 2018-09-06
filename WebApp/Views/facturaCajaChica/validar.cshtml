@@ -1,0 +1,46 @@
+﻿@model Entidades.eFacturaCajaChica
+
+@using (Html.BeginForm("guardarValidar", "facturaCajaChica", FormMethod.Post, new { id = "popupForm" }))
+{
+
+
+<div class="form-horizontal">
+    <h2>Validar factura de caja chica</h2>
+   Ingrese fecha correspondiente al estado de cuenta del banco
+    <hr />
+
+    <div class="form-group">
+
+        <div class="control-label col-md-2"> </div>
+        <div class="col-md-10">
+            <label class="hidden" id="fecha"> @Convert.ToDateTime(@ViewBag.dia).ToShortDateString()</label>
+            @Html.EditorFor(model => model.fecha, new { htmlAttributes = new { @class = "hidden" } })
+            
+            @Html.EditorFor(model => model.codDoctoCxP, new { htmlAttributes = new { @class = "hidden" } })
+            @Html.EditorFor(model => model.serie, new { htmlAttributes = new { @class = "hidden" } })
+            @Html.EditorFor(model => model.numero, new { htmlAttributes = new { @class = "hidden" } })
+            @Html.EditorFor(model => model.codProveedor, new { htmlAttributes = new { @class = "hidden" } })
+
+        </div>
+    </div>
+
+
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" id="btnGuardar" value="Guardar" class="btn btn-primary" />
+        </div>
+    </div>
+</div>
+}
+
+<script src="~/Scripts/moment.js"></script>
+@section scripts {
+    <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+    <script>
+  $( function() {
+      $("#datepicker").datepicker({ dateFormat: "dd/mm/yy" }).val()
+  } );
+    </script>
+
+}

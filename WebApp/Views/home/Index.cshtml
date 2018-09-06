@@ -1,0 +1,236 @@
+﻿
+@{
+    ViewBag.Title = "SAES";
+}
+@model List<Entidades.eMenu>
+
+<nav class="navbar navbar-light" style="background-color:#F8F9F9;">
+    <div class="container-fluid">
+        <div class="navbar-header">
+        </div>
+        <ul class="nav navbar-nav">
+            <!-- Unidad de verificacion -->
+            <li class="dropdown"> 
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <span class="glyphicon glyphicon-eye-open"></span> Unidad de Verificación <span class="caret"></span> </a>
+                <ul class="dropdown-menu">
+                    <li class="dropdown-header">Mantenimientos</li>
+                    <li class="divider"></li>
+                    <li class="dropdown-header">Procesos</li>
+                        <li>@if(activarMenu("ERPKBA",Model) == true){ @Html.ActionLink("Establecer Día de Trabajo", "elegirDia", "usuario", "", new { @class = "dropdown-item " });} </li>
+                        <li>@if (activarMenu("ERPKBB", Model) == true) { @Html.ActionLink("Verificación de Informes", "edit", "informedbr", "", new { @class = "dropdown-item " }); } </li>
+                        <li>@if (activarMenu("ERPKBC", Model) == true) { @Html.ActionLink("Movimiento de Efectivo", "edit", "movimientoefectivo", "", new { @class = "dropdown-item" });}</li>
+                        <li>@if (activarMenu("ERPKBD", Model) == true) {@Html.ActionLink("Movimiento de Tarjetas de Crédito", "edit", "movimientoTC", "", new { @class = "dropdown-item" }); }</li>
+                        <li>@if (activarMenu("ERPKBE", Model) == true) {@Html.ActionLink("Validación de Cupones", "vercupones", "cupon", "", new { @class = "dropdown-item" }); }</li>
+                        <li>@if (activarMenu("ERPKBF", Model) == true) {@Html.ActionLink("Pagos de Clientes Crédito", "edit", "movimientopagocc", "", new { @class = "dropdown-item" }); }</li>
+                        <li>@if (activarMenu("ERPKBG", Model) == true) {@Html.ActionLink("Pagos de Clientes Crédito con Tarjeta De Crédito", "edit", "movimientoPagoTC", "", new { @class = "dropdown-item" });}</li>
+                        <li>@if (activarMenu("ERPKBH", Model) == true) {@Html.ActionLink("Caja chica", "edit", "facturaCajaChica", "", new { @class = "dropdown-item" });}</li>
+                        <li>@if (activarMenu("ERPKBI", Model) == true) {@Html.ActionLink("Otros documentos", "edit", "doctoOtros", "", new { @class = "dropdown-item" });}</li>
+                        <li class="SubMenuTitulo">Correciones <span class="caret"></span>
+                            <ul class="itemSubMenu">
+                                <li>@if (activarMenu("ERPKBJA", Model) == true)
+                                {@Html.ActionLink("Abrir Pantalla de Verificación Finalizada", "entornoAperturaPantalla", "pantalla", "", new { @class = "dropdown-item" });
+                            }</li>
+                            </ul>
+                        </li>
+
+                    <li class="divider"></li>
+                    <li class="dropdown-header">Informes</li>
+                        <li class="SubMenuTitulo">Movimiento de Efectivo <span class="caret"></span>
+                            <ul class="itemSubMenu">
+                                <li>@if (activarMenu("ERPKCAA", Model) == true) {@Html.ActionLink("Consolidado de Movimiento de Efectivo", "entornoMovEfectivoXFechaXEstacion", "movimientoefectivo", "", new { @class = "dropdown-item" }); }</li>
+                                <li>@if (activarMenu("ERPKCAB", Model) == true) {@Html.ActionLink("Movimiento de Efectivo por fecha", "entornoMovEfectivoXFecha", "movimientoefectivo", "", new { @class = "dropdown-item" }); }</li>
+                                <li>@if (activarMenu("ERPKCAC", Model) == true) {@Html.ActionLink("Venta Diaria vs Conciliado por fecha", "entornoVentaDiariaVSConciliadoXFecha", "movimientoefectivo", "", new { @class = "dropdown-item" }); }</li>
+                                <li>@if (activarMenu("ERPKCAD", Model) == true) {@Html.ActionLink("Gráfica de Ingresos", "entornoVentaDiariaVSConciliadoXFechaxEstacion", "movimientoefectivo", "", new { @class = "dropdown-item" }); }</li>
+                                <li>@if (activarMenu("ERPKCAE", Model) == true) {@Html.ActionLink("Informe de flujo de efectivo por mes", "entornoFlujoEfectivoxMes", "movimientoefectivo", "", new { @class = "dropdown-item" }); }</li>
+                                <li>@if (activarMenu("ERPKCAF", Model) == true) {@Html.ActionLink("Ingresos acreditados en bancos por venta de combustible", "entornoFlujoEfectivoxMensual", "movimientoefectivo", "", new { @class = "dropdown-item" }); }</li>
+                            </ul>
+                        </li>
+                        <li class="SubMenuTitulo">Movimiento de Tarjeta de Crédito  <span class="caret"></span>
+                            <ul class="itemSubMenu">
+                                <li>@if (activarMenu("ERPKCBA", Model) == true) {@Html.ActionLink("Consolidado de Movimiento de Tarjeta", "entornoMovTcXFechaXEstacion", "movimientotc", "", new { @class = "dropdown-item" });}</li>
+                                <li>@if (activarMenu("ERPKCBB", Model) == true) {@Html.ActionLink("Movimiento de Tarjeta de Crédito por fecha", "entornoMovTcXFecha", "movimientotc", "", new { @class = "dropdown-item" });}</li>
+                            </ul>
+                        </li>
+                        <li class="SubMenuTitulo">Clientes Crédito en Efectivo  <span class="caret"></span>
+                            <ul class="itemSubMenu">
+                                <li>@if (activarMenu("ERPKCCA", Model) == true) {@Html.ActionLink("Consolidado de Pago de Clientes Crédito en Efectivo", "entornoMovCcXFechaXEstacion", "movimientoPagoCC", "", new { @class = "dropdown-item" });}</li>
+                                <li>@if (activarMenu("ERPKCCB", Model) == true) {@Html.ActionLink("Pago de Clientes Crédito en Efectivo", "entornoMovCcXFecha", "movimientoPagoCC", "", new { @class = "dropdown-item" });}</li>
+                            </ul>
+                        </li>
+                        <li class="SubMenuTitulo">Clientes Crédito con Tarjeta de Crédito  <span class="caret"></span>
+                            <ul class="itemSubMenu">
+                                <li>@if (activarMenu("ERPKCDA", Model) == true) {@Html.ActionLink("Consolidado de Pagos de Clientes Crédito con Tarjeta De Crédito", "entornoMovPagoTCXFechaXEstacion", "movimientoPagoTC", "", new { @class = "dropdown-item" });}</li>
+                                <li>@if (activarMenu("ERPKCDB", Model) == true) {@Html.ActionLink("Pagos de Clientes Crédito con Tarjeta De Crédito", "entornoMovPagoTCXFecha", "movimientoPagoTC", "", new { @class = "dropdown-item" });}</li>
+                            </ul>
+                        </li>
+                        <li class="SubMenuTitulo">Generales  <span class="caret"></span>
+                            <ul class="itemSubMenu">
+                                <li>@if (activarMenu("ERPKCDB", Model) == true) {@Html.ActionLink("Trabajo Verificado", "entornoInformeTrabajoVerificado", "verificacion", "", new { @class = "dropdown-item" });}</li>
+                                <li>@if (activarMenu("ERPKCDB", Model) == true) {@Html.ActionLink("Desglose Trabajo Verificado", "entornoInformeDesgloseTrabajoVerificado", "verificacion", "", new { @class = "dropdown-item" });}</li>
+                                <li>@if (activarMenu("ERPKCDB", Model) == true) {@Html.ActionLink("Bitácora", "entornoInformeBitacora", "observacionUV", "", new { @class = "dropdown-item" });}</li>
+                                <li>@if (activarMenu("ERPKCDB", Model) == true) {@Html.ActionLink("Consolidado Otros documentos", "entornoMovOtrosXFechaXEstacion", "doctoOtros", "", new { @class = "dropdown-item" });}</li>
+                            </ul>
+                        </li>
+                </ul>
+            </li>  
+            <!--fin Unidad de Verificacion-->
+            <!-- Presupuesto-->
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <span class="glyphicon glyphicon-calendar"></span> Presupuesto <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li class="dropdown-header">Mantenimientos</li>
+                        <li>@if (activarMenu("ERPIAA", Model) == true) {@Html.ActionLink("Empleados", "entornopresu", "empleado", "", new { @class = "dropdown-item " }) ; }</li>
+                    <li class="divider"></li>
+                    <li class="dropdown-header">Procesos</li>
+                        <li>@if (activarMenu("ERPIBA", Model) == true) {@Html.ActionLink("Ingreso de Salarios", "entornoingresosalarios", "empleado", "", new { @class = "dropdown-item " }); } </li>
+                        <li>@if (activarMenu("ERPIBB", Model) == true) {@Html.ActionLink("Calcular Prestacion Laboral", "calcularprestacionlaboral", "presupuesto", "", new { @class = "dropdown-item " }); } </li>
+                        <li>@if (activarMenu("ERPIBC", Model) == true) {@Html.ActionLink("Presupuesto OPEX", "entornoOpex", "presupuesto", "", new { @class = "dropdown-item " }) ; }</li>
+                        <li>@if (activarMenu("ERPIBD", Model) == true) {@Html.ActionLink("Presupuesto OPEX Ejecutado", "entornoOpexjecutado", "presupuesto", "", new { @class = "dropdown-item " }) ; }</li>
+                        <li>@if (activarMenu("ERPIBE", Model) == true) {@Html.ActionLink("Presupuesto Ingresos (Galones)", "entornoING", "presupuesto", "", new { @class = "dropdown-item " }); } </li>
+                        <li>@if (activarMenu("ERPIBF", Model) == true) {@Html.ActionLink("Establecer Precio, Margen y Transporte", "entornoINGretail", "presupuesto", "", new { @class = "dropdown-item " }) ; }</li>                             
+                    <li class="divider"></li>
+                    <li class="dropdown-header">Informes</li>              
+                        <li class="SubMenuTitulo">Egresos  <span class="caret"></span>
+                        <ul class="itemSubMenu">
+                            <li>@if (activarMenu("ERPICAA", Model) == true) {@Html.ActionLink("Presupuesto por Empresa ", "entornoinfoopexxempresa", "presupuesto", "", new { @class = "dropdown-item " }) ; }</li>
+                            <li>@if (activarMenu("EERPICAB", Model) == true) {@Html.ActionLink("Presupuesto por Unidad de Negocio ", "entornoInfoOpexxUnidadNegocio", "presupuesto", "", new { @class = "dropdown-item " }); } </li>
+                            <li>@if (activarMenu("ERPICAC", Model) == true) {@Html.ActionLink("Presupuesto por Area ", "entornoinfoopexxarea", "presupuesto", "", new { @class = "dropdown-item " }); } </li>
+                            <li>@if (activarMenu("ERPICAD", Model) == true) {@Html.ActionLink("Presupuesto por Departamento", "entornoinfoopexxdepartamento", "presupuesto", "", new { @class = "dropdown-item " }) ; }</li>
+                        </ul>
+                    </li>
+                    <li class="SubMenuTitulo">Ingresos  <span class="caret"></span>
+                        <ul class="itemSubMenu">
+                            <li>@if (activarMenu("ERPICBA", Model) == true) {@Html.ActionLink("Presupuesto por Departamento", "entornoInfoIngreRetail", "presupuesto", "", new { @class = "dropdown-item " }) ; }</li>
+                            <li>@if (activarMenu("ERPICBB", Model) == true) {@Html.ActionLink("Presupuesto de Volumen por Unidad de Negocio ", "entornoInfoIngreVolxUnidadNegocio", "presupuesto", "", new { @class = "dropdown-item " }) ; }</li>                          
+                            <li>@if (activarMenu("ERPICBC", Model) == true) {@Html.ActionLink("Presupuesto Volumen Corporativo Retail", "entornoInfoCorporativoRetail", "presupuesto", "", new { @class = "dropdown-item " }) ; }</li>
+                            <li>@if (activarMenu("ERPICBD", Model) == true) {@Html.ActionLink("Presupuesto Volumen Retail Sub corporativo", "entornoInfoSubCorporativoRetail", "presupuesto", "", new { @class = "dropdown-item " }); } </li>
+                            <li>@if (activarMenu("ERPICBE", Model) == true) {@Html.ActionLink("Presupuesto Volumen Retail por Empresa", "entornoInfoEmpresaRetail", "presupuesto", "", new { @class = "dropdown-item " }) ; }</li>
+                            <li>@if (activarMenu("ERPICBF", Model) == true) {@Html.ActionLink("Presupuesto Volumen Retail por Sucursal", "entornoInfoSucursalRetail", "presupuesto", "", new { @class = "dropdown-item " }); } </li>
+                            <li>@if (activarMenu("ERPICBG", Model) == true) {@Html.ActionLink("Presupuesto Retail Consolidado", "entornoInfoTotalRetail", "presupuesto", "", new { @class = "dropdown-item " }) ; }</li>
+                            <li>@if (activarMenu("ERPICBH", Model) == true) {@Html.ActionLink("Estado de Resultados Presupuestario", "entornoInfoTotalPresupuesto", "presupuesto", "", new { @class = "" }); } </li>                           
+                        </ul>
+                   </li>
+                </ul>
+            </li> 
+            <!--Fin Presupuesto-->
+            <!--RRHH-->
+            <li class="dropdown"> 
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <span class="glyphicon glyphicon-user"></span> RRHH  <span class="caret"></span> </a>
+                <ul class="dropdown-menu">
+                    <li class="dropdown-header">Mantenimientos</li>
+                        <li>@if (activarMenu("ERPLAA", Model) == true) {@Html.ActionLink("Empleados", "entorno", "empleado", "", new { @class = "dropdown-item " }) ; }</li>
+                        <li>@if (activarMenu("ERPLAB", Model) == true) {@Html.ActionLink("Busqueda de Empleados", "busqueda", "empleado", "", new { @class = "dropdown-item " }) ; }</li>
+                        <li>@if (activarMenu("ERPLAC", Model) == true) {@Html.ActionLink("Tipos de Baja", "listar", "tipobaja", "", new { @class = "dropdown-item " }) ; }</li>
+                    <li class="divider"></li>
+                    <li class="dropdown-header">Procesos</li>
+                    <li class="divider"></li>
+                    <li class="dropdown-header">Informes</li>
+                            <li>@if (activarMenu("ERPLCA", Model) == true) {@Html.ActionLink("Listado de Empleados", "entornoInfoEmpleados", "empleado", "", new { @class = "dropdown-item " }) ; }</li>                             
+                </ul>
+            </li>
+            <!--Fin RRHH-->
+            <!--Manual de Usuario-->
+            <li class="dropdown">
+                <a href="~/manual/index"><span class="glyphicon glyphicon-question-sign"></span> Manual de Usuario</a>
+            </li>
+            <!--Fin Manual de Usuario-->
+        </ul>
+    </div>
+</nav>
+
+
+@functions 
+{
+   public static bool activarMenu(string tag,List<Entidades.eMenu> listmenu)
+   {
+       bool resultado = false;
+       foreach (var item in listmenu)
+       {
+           if (item.menu == tag)
+               resultado = true;
+       }
+       return resultado;
+   }
+ }
+
+<nav class="navbar navbar-fixed-bottom navbar-light">
+    <div class="container">
+
+        <div class="btn-group">
+
+            @Html.ActionLink("Cambiar Entorno", "entorno", "usuario", "", new { @class = "btn btn-primary" })
+
+            @Html.ActionLink("Salir", "login", "usuario", "", new { @class = "btn btn-danger" })
+        </div>
+    </div>
+
+</nav>
+<style>
+    ul, ol {
+        list-style: none;
+        position: relative;
+    }
+
+    .nav li a {
+        text-decoration: none;
+        display: block;
+    }
+
+    .nav li a:hover {
+        background-color: #e5e8e8;
+        transition: all 0.2s ease-in-out 0s, visibility 0s linear 0.2s, z-index;
+    }
+
+    .nav > li {
+        float: left;
+        position: relative;
+    }
+
+    .nav li ul {
+        display: none;
+        position: absolute;
+        min-width: 140px;
+    }
+
+    .nav li:hover > ul {
+        display: block;
+    }
+
+
+    .nav li ul li:hover {
+        position: relative;
+        transition: all 0s ease;
+   background-color: #e5e8e8;
+        transition: all 0.2s ease-in-out 0s, visibility 0s linear 0.2s, z-index;
+    }
+
+    .nav li ul li ul {
+        left: 82%;
+        top: -2%;
+    }
+    
+        .nav li ul li ul a {
+       background-color: #ffffff;
+            color: #000000;
+            padding: 5px 15px;
+       text-decoration: none;
+       display: block;
+       width: 250%;
+       overflow: hidden;
+            -webkit-box-shadow: 3px 3px 8px -1px rgba(0,0,0,0.48);
+            -moz-box-shadow: 3px 3px 8px -1px rgba(0,0,0,0.48);
+       box-shadow: 3px 3px 8px -1px rgba(0,0,0,0.48);
+   }
+
+
+    .SubMenuTitulo {
+        padding: 5px 15px;
+        transition: all 0s ease;
+    }
+    .nav li ul li ul a:hover .SubMenuTitulo {
+        background-color: #e5e8e8;
+        transition-delay: .15s;
+    }
+
+</style>
+

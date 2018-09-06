@@ -1,0 +1,77 @@
+﻿@model Entidades.eUsuario
+
+@{
+    ViewBag.Title = "login";
+}
+
+
+    
+            @using (Html.BeginForm("loginVerificar", "usuario", FormMethod.Post, new { @class = "form-signin" }))
+            {
+              <center class="form-signin-heading">
+                 <img src="~/images/logo.png" />  
+                    
+            </center>
+          
+            <label class="sr-only" for="codigo">Usuario</label>
+            @Html.EditorFor(model => model.codigo, new { htmlAttributes = new { @class = "form-control", @style = "text-transform: uppercase", placeholder = "Usuario", maxlength = "15" } })
+            @Html.ValidationMessageFor(model => model.codigo)
+            <label class="sr-only" for="clave">Contraseña</label>
+
+            @Html.PasswordFor(model => model.clave, htmlAttributes: new { @class = "form-control", placeholder = "CONTRASEÑA", maxlength = "15" })
+            @Html.ValidationMessageFor(model => model.clave)
+            <input type="submit" value="Iniciar" class="btn btn-lg btn-primary btn-block" />
+
+                if (ViewBag.login == "false")
+                {
+                <div class="alert alert-warning">Usuario o contraseña incorrecta</div>
+                }
+
+            }
+    
+
+
+<style>
+    body {
+  padding-top: 40px;
+  padding-bottom: 40px;
+
+}
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+.form-signin .form-signin-heading{
+  margin-bottom: 10px;
+}
+
+.form-signin .form-control {
+  position: relative;
+  box-sizing: border-box;
+  height: auto;
+  padding: 10px;
+  font-size: 16px;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="email"] {
+  margin-bottom: 3px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+</style>
+
+
+@section scripts
+{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    }

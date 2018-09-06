@@ -1,0 +1,110 @@
+﻿@model  Entidades.eMovimientoEfectivo
+
+<div class="container">
+
+    @using (Html.BeginForm("VerInformeVentaDiariaVSConciliadoXFecha", "movimientoefectivo", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        <h4>Selección de Entorno Informe de Venta Diaria vs Conciliado</h4>
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="control-label col-md-2" for="codEmpresa">Empresa</label>
+                <div class="col-md-4">
+
+                    @Html.DropDownListFor(m => m.codEmpresa, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2" for="codSucursal">Unidad de Negocio</label>
+                <div class="col-md-4">
+                    @Html.DropDownListFor(m => m.codSucursal, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control col-md-4" })
+                </div>
+            </div>
+
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-md-2" for="dia" style="text-align:right">Fecha inicial</label>
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.dia, new { htmlAttributes = new { @Value = @DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control col-md-4" } })
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-md-2" for="dia2" style="text-align:right">Fecha final</label>
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.dia2, new { htmlAttributes = new { @Value = @DateTime.Now.Date.ToString("dd/MM/yyyy"), @class = "form-control col-md-4" } })
+                    </div>
+                </div>
+            </div>
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-md-2" for="formatoInforme" style="text-align:right">Formato</label>
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.formatoInforme, new List<SelectListItem> { new SelectListItem { Text = "PDF", Value = "PDF" }, new SelectListItem { Text = "EXCEL", Value = "EXCEL" } }, htmlAttributes: new { @class = "form-control col-md-4" })
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-4">
+                    <input type="submit" value="Imprimir" class="btn btn-primary" />
+                    @Html.ActionLink("Regresar", "index", "home", "", new { @class = "btn btn-danger" })
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+
+@section scripts
+{
+
+    <script>
+        var codEmpre = "00000"; 
+        var desEmpre = "Todas";
+        $(document).ready(function () {
+            // ----- obtener empresas
+            $.getJSON('/presupuesto/getEmpresas', null, function (data) {
+                $('#codEmpresa').append('<option value=' +
+                    '00000' + '>' + 'TODAS' + '</option>');
+                $.each(data, function () {
+                    $('#codEmpresa').append('<option value=' +
+                        this.codigo + '>' + this.descripcion + '</option>');
+                });
+                // ----- obtener sucursales
+                $.getJSON('/presupuesto/getSucursales', { codEmpresa: $('#codEmpresa').val() }, function (data) {
+                    $('#codSucursal').append('<option value=' +
+                        '0000' + '>' + 'TODAS' + '</option>');
+                    $.each(data, function () {
+                        $('#codSucursal').append('<option value=' +
+                            this.codigoSucursal + '>' + this.descripcion + '</option>');
+                    });
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener sucursales');
+                });
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert('Error al obtener Empresas!');
+            });
+            // ------ fin de carga inicial --------------------------------------------------------------------------
+
+            // ------ obtener sucursales cuando la empresa cambie
+            $('#codEmpresa').change(function () {
+                $('#codSucursal option').remove();
+                $.getJSON('/presupuesto/getSucursales', { codEmpresa: $('#codEmpresa').val() }, function (data) {
+                    $('#codSucursal').append('<option value=' +
+                        '0000' + '>' + 'TODAS' + '</option>');
+                    $.each(data, function () {
+                        $('#codSucursal').append('<option value=' +
+                            this.codigoSucursal + '>' + this.descripcion + '</option>');
+                    });                    
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener sucursales');
+                });
+            });
+            
+        });
+    </script>
+}

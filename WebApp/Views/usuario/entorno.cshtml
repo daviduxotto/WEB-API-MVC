@@ -1,0 +1,77 @@
+﻿@model  Entidades.eEntorno
+
+@{
+    ViewBag.Title = "Entorno";
+}
+
+
+@using (Html.BeginForm("procesarEntorno", "usuario", FormMethod.Post))
+{
+@Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+     <div class="col-md-offset-2 col-md-10">
+         <h4>Selección de Entorno</h4>
+         </div>
+    <div class="form-group">
+        <label class="control-label col-md-2" for="empresa">Empresa</label>
+        <div class="col-md-10">
+          
+            @Html.DropDownListFor(m=> m.empresa,Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class="form-control"})
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-md-2" for="sucursal">Sucursal</label>
+        <div class="col-md-10">
+            @Html.DropDownListFor(m => m.sucursal, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Siguiente" class="btn btn-primary" />
+            @Html.ActionLink("Salir", "login", "usuario", new { @class = "btn btn-danger" })
+        </div>
+    </div>  
+</div>
+}
+
+
+   
+@section scripts
+{
+
+    <script>
+        $(document).ready(function () {
+            // Get a list of Empresas and a list of products of the first Empresa.
+            $.getJSON('/usuario/getEmpresas', null, function (data) {
+                $.each(data, function () {
+                    $('#empresa').append('<option value=' +
+                      this.codigo + '>' + this.descripcion + '</option>');
+                });
+               $.getJSON('/usuario/getSucursales', { codEmpresa: $('#empresa').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#sucursal').append('<option value=' +
+                          this.codigoSucursal + '>' + this.descripcion+ '</option>');
+                    });
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener sucursales');
+                });   
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert('Error al obtener Empresas!');
+            });
+            // Dropdown list change event.
+            $('#empresa').change(function () {
+                $('#sucursal option').remove();
+                $.getJSON('/usuario/getSucursales', { codEmpresa: $('#empresa').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#sucursal').append('<option value=' +
+                          this.codigoSucursal+ '>' + this.descripcion+ '</option>');
+                    });
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener sucursales');
+                });
+            });   
+        });
+    </script>
+}

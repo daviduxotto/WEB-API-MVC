@@ -1,0 +1,45 @@
+﻿@model Entidades.eCupon
+
+@{
+   ViewBag.Title = "Editar Cupon";
+}
+
+@using (Html.BeginForm("guardarEditarCupon", "cupon", FormMethod.Post, new { id = "popupForm" }))
+{
+<div class="form-horizontal">
+    <h4>Editar Cupon</h4>
+    <hr />
+
+    @Html.EditorFor(m => m.codEmisor, new { htmlAttributes = new { @class = "hidden" } })
+
+    @Html.EditorFor(m => m.codDenominacion, new { htmlAttributes = new { @class = "hidden" } })
+    @Html.EditorFor(m => m.numeroAnterior, new { htmlAttributes = new { @class = "hidden" } })
+    <div class="form-group">
+        <label for="Numero" class="control-label col-md-2">Numero</label>
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.numero, new { @Value = Model.numeroAnterior, htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.numero)
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Guardar" class="btn btn-primary" />
+        </div>
+    </div>
+</div>
+}
+
+
+
+@section scripts
+{
+
+    <script>
+        $(document).ready(function () {
+        
+       
+          
+        });
+    </script>
+
+}

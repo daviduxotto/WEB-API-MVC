@@ -1,0 +1,85 @@
+﻿@model Entidades.eEmpleado
+
+@{
+    ViewBag.Title = "entorno";
+}
+
+<h2>Selección entorno para Ingreso de Salarios</h2>
+
+@using (Html.BeginForm("ingresarSalarios", "empleado", FormMethod.Post))
+{
+
+
+    <div class="form-horizontal">
+        
+        <div class="form-group">
+            <label class="control-label col-md-2" for="empresa">Empresa</label>
+            <div class="col-md-4">
+
+                @Html.DropDownListFor(m => m.empresa, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="estacion">Unidad de Negocio</label>
+            <div class="col-md-4">
+                @Html.DropDownListFor(m => m.estacion, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control col-md-4" })
+            </div>
+        </div>
+
+       
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Procesar" class="btn btn-primary" />
+                @Html.ActionLink("Regresar", "index", "home", "", new { @class = "btn btn-danger" })
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@section scripts
+{
+
+    <script>
+        $(document).ready(function () {
+            // ----- obtener empresas
+            $.getJSON('/empleado/getEmpresas', null, function (data) {
+                $.each(data, function () {
+                    $('#empresa').append('<option value=' +
+                      this.codigo + '>' + this.descripcion + '</option>');
+                });
+                // ----- obtener sucursales
+               $.getJSON('/empleado/getSucursales', { codEmpresa: $('#empresa').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#estacion').append('<option value=' +
+                          this.codigoSucursal + '>' + this.descripcion+ '</option>');
+                    });
+                 
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener sucursales');
+                });
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert('Error al obtener Empresas!');
+            });
+            // ------ fin de carga inicial --------------------------------------------------------------------------
+
+            // ------ obtener sucursales cuando la empresa cambie
+            $('#empresa').change(function () {
+                $('#estacion option').remove();
+                $.getJSON('/empleado/getSucursales', { codEmpresa: $('#empresa').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#estacion').append('<option value=' +
+                          this.codigoSucursal + '>' + this.descripcion + '</option>');
+                    });                  
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener sucursales');
+                });
+            });
+        });
+    </script>
+}
+
+

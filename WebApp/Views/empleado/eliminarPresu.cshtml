@@ -1,0 +1,15 @@
+﻿@model Entidades.eEmpleado
+
+@using (Html.BeginForm("procesarEliminarPresu", "empleado", FormMethod.Post, new { id = "popupForm" }))
+{
+<h2>¿Desea eliminar?</h2>
+ <p>Empleado: @Model.primerNombre</p>       
+                @Html.EditorFor(model => model.codigoCorp, new { htmlAttributes = new { @class = "hidden" } })
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Eliminar" class="btn btn-danger" />
+            </div>
+        </div>
+  
+}

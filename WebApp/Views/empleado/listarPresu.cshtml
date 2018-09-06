@@ -1,0 +1,222 @@
+﻿@model List<Entidades.eEmpleado>
+@{
+   ViewBag.Title = "empleados";
+}
+<br />
+<h3>Mantenimiento Empleados de Presupuesto</h3>
+<table class="table">
+    <thead class="bg-info">
+        <tr>
+
+            <th scope="col">Empresa</th>
+            <th scope="col">Unidad De Negocio</th>
+            <th scope="col">Area</th>
+            <th scope="col">Departamento</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+
+            <td>@ViewBag.empresa</td>
+            <td>@ViewBag.estacion</td>
+            <td>@ViewBag.area </td>
+            <td>@ViewBag.departamento</td>
+ 
+        </tr>
+    </tbody>
+</table>
+<div class="table table-striped tablecontainer">
+  
+    <table id="tablaEmpleados">
+        <thead class="bg-info">
+            <tr>
+                <th></th>            
+                <th>Nombre</th>
+                <th></th>   
+                <th></th>   
+                <th></th>   
+                <th></th>   
+                <th></th>                    
+                <th>Puesto</th>
+                <th>Salario Ordinario</th>
+                <th></th>    
+                <th></th>   
+            </tr>
+        </thead>
+    </table>
+    <hr />
+    @Html.ActionLink("Salir", "index", "home", "", new { @class = "btn btn-danger" })
+    @Html.ActionLink("Agregar Empleado", "nuevoPresu", "empleado", "", new { @class = "popup btn btn-primary" })
+
+</div>
+
+
+<style>
+    .left {
+        text-align: left;
+    }
+
+    .right {
+        text-align: right;
+    }
+
+    .center {
+        text-align: center;
+    }
+</style>
+
+
+
+
+
+
+
+@section scripts
+{
+    <script src="~/Scripts/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+      $(document).ready(function ()
+      {
+          $('[data-toggle="tooltip"]').tooltip()
+    
+          var oTable = $('#tablaEmpleados').DataTable(
+              {
+              "searching": false,
+              "paging": false,
+              language: {
+                  decimal: ",",
+                  processing:     "Procesando...",
+                  search:         "Buscar:",
+                  lengthMenu:    "",
+                  info:           "",
+                  infoEmpty:      "",
+                  infoFiltered:   "",
+                  infoPostFix:    "",
+                  loadingRecords: "",
+                  zeroRecords:    "",
+                  emptyTable:     "",
+                  paginate: {
+                      first:      "Primero",
+                      previous:   "Anterior",
+                      next:       "Siguiente",
+                      last:       "Ultimo"
+                  },
+                  aria: {
+                      sortAscending:  ": activer pour trier la colonne par ordre croissant",
+                      sortDescending: ": activer pour trier la colonne par ordre décroissant"
+                  }
+              },
+                   "ajax": {
+                       "url": '/empleado/getEmpleadoxEmpresaxAreaXDepartamentoPresu',
+                       "type" : "get",
+                       "datatype" : "json"
+                   },
+                   "columns": [
+                       { "data": "codigoCorp", width: 5, "class": "hidden"},
+                       { "data": "primerNombre", "autoWidth": true },
+                       { "data": "segundoNombre", "autoWidth": true },
+                       { "data": "tercerNombre", "autoWidth": true },
+                       { "data": "primerApellido", "autoWidth": true },
+                       { "data": "segundoApellido", "autoWidth": true },
+                       { "data": "apellidoCasada", "autoWidth": true },
+                       { "data": "descPuesto", width: 450 },
+                      { "data": "salario", "autoWidth": true, "className": "right", "type": "numeric-comma", targets: 3 },
+                        {
+                            "data": "codigoCorp", "width": "10", "render": function (data, type, full) {
+                                return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Editar Empleado"  href="/empleado/editarPresu/1?codigo=' + full.codigoCorp + ' "> <span class="glyphicon glyphicon-pencil"></span></a>';
+                            }
+                        },
+                       {
+                              "data": "codigoCorp", "width": "10", "render": function (data, type, full) {
+                                  return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Eliminar Empleado"  href="/empleado/eliminarPresu/1?codigo=' + full.codigoCorp + '&nombre=' + full.primerNombre.replace(' ', '*') + ' "> <span class="glyphicon glyphicon-trash"></span></a>';
+                              }
+                       }
+                      
+                   ]
+                })
+          // -- Eventos Clicks
+          // -- Boton con Vista Parcial
+          $('.tablecontainer').on('click', 'a.popup', function (e)
+          {
+              e.preventDefault();
+              OpenPopup($(this).attr('href'));
+          })
+
+          // -- Boton sin Vista
+          $('.tablecontainer').on('click', 'a.popup1', function (e)
+          {
+              e.preventDefault();
+              var url = $(this).attr('href')
+              $.ajax({
+                  type: "POST",
+                  url: url,
+                  success: function (data)
+                  {
+                      if (data.status)
+                      {
+
+                          oTable.ajax.reload();
+                       
+                      }
+                  }
+              })
+          })
+
+          // --Popup
+          function OpenPopup(pageUrl)
+          {
+              var $pageContent = $('<div/>');
+              $pageContent.load(pageUrl, function ()
+              {
+              });
+              // -- Abrir Dialogo
+              $dialog = $('<div class="popupWindow" style="overflow:auto"></div>')
+                        .html($pageContent)
+                        .dialog(
+                        {
+                            draggable: true,
+                            autoOpen: false,
+                            resizable: false,
+                            model: true,
+                            title: '',
+                            height: 'auto',
+                            width: 600,
+                            close: function ()
+                            {
+                                $dialog.dialog('destroy').remove();
+                            }
+                        })
+              // -- Enviar Formulario
+              $('.popupWindow').on('submit', '#popupForm', function (e)
+              {
+                  var url = $('#popupForm')[0].action;
+                  $.ajax({
+                      type: "POST",
+                      url: url,
+                      data: $('#popupForm').serialize(),
+                      success: function (Data) {
+                          if (Data.retorno >= 1) {
+                              $dialog.dialog('close');
+                              oTable.ajax.reload();
+
+                              alert("Operacion exitosa ");
+                          }
+                          else
+                          {
+                              alert(Data.mensaje);
+                          }
+                      }
+                  })
+                  e.preventDefault();
+              })
+              $dialog.dialog('open');
+          }
+
+
+      });
+
+    </script>
+}

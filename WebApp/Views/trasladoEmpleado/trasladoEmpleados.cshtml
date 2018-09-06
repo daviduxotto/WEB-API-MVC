@@ -1,0 +1,65 @@
+﻿@model IEnumerable<Entidades.eTrasladoEmpleado>
+
+<h4>Traslado de Empleados</h4>
+@{ int i = 0;  }
+
+@foreach (var item in Model)
+{ i++;
+    if (@i == 1)
+    {
+        @Html.DisplayFor(modelItem => item.nombre)
+    }
+}
+
+<table class="table" id="popupForm" style="width:800px">
+    <tr>       
+        <th class="input-group-sm">
+            Fecha
+        </th>
+        <th  class="input-group-sm">
+            Empresa Anterior
+        </th>
+        <th  class="input-group-sm">
+            Sucursal Anterior
+        </th>
+        <th>
+
+        </th>
+        <th class="input-group-sm">
+            Empresa
+        </th>
+        <th  class="input-group-sm">
+            Sucursal
+        </th>
+
+
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+           
+            <td  class="input-group-sm">
+                @Html.DisplayFor(modelItem => item.fechaTraslado)
+            </td>
+            <td class="input-group-sm">
+                @Html.DisplayFor(modelItem => item.empresaAnterior)
+            </td>
+            <td class="input-group-sm">
+                @Html.DisplayFor(modelItem => item.sucursalAnterior)
+            </td>
+            <td > <span class="glyphicon glyphicon-chevron-right"></span></td>
+            <td>
+                @Html.DisplayFor(modelItem => item.empresa)
+            </td>
+            <td class="input-group-sm">
+                @Html.DisplayFor(modelItem => item.sucursal)
+            </td>
+
+
+
+        </tr>
+    }
+
+</table>

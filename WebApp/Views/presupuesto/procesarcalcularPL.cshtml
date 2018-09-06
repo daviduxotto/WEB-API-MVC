@@ -1,0 +1,14 @@
+﻿@if (ViewBag.retorno != null)
+{
+    if (Convert.ToInt32(ViewBag.retorno) >= 1)
+    {
+    <div class="alert alert-info">@ViewBag.mensaje</div>
+    }
+    else
+    {
+    <div class="alert alert-warning">@ViewBag.mensaje</div>
+    }
+}
+<div>
+    @Html.ActionLink("Salir al Menú", "index", "home", "", new { @class = "btn btn-danger" })
+</div>

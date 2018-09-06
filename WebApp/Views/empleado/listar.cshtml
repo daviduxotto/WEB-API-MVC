@@ -1,0 +1,256 @@
+﻿@model List<Entidades.eEmpleado>
+@{
+   ViewBag.Title = "empleados";
+}
+<br />
+<br />
+<h3>Mantenimiento Empleados</h3>
+<table class="table">
+    <thead class="bg-info">
+        <tr>
+
+            <th scope="col">Empresa</th>
+            <th scope="col">Unidad De Negocio</th>
+            <th scope="col">Area</th>
+            <th scope="col">Departamento</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+
+            <td>@ViewBag.empresa</td>
+            <td>@ViewBag.estacion</td>
+            <td>@ViewBag.area </td>
+            <td>@ViewBag.departamento</td>
+ 
+        </tr>
+    </tbody>
+</table>
+<div class="table table-striped tablecontainer">
+  
+    <table id="tablaEmpleados">
+        <thead class="bg-info">
+            <tr>
+                <th>Cod.</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>Nombre</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>Puesto</th>
+                <th>Salario Ordinario</th>
+                <th>Fecha Ingreso</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+    </table>
+    <hr />
+    @Html.ActionLink("Salir", "index", "home", "", new { @class = "btn btn-danger" })
+    @Html.ActionLink("Agregar Empleado", "nuevo", "empleado", "", new { @class = "popup btn btn-primary" })
+    @Html.ActionLink("VerInforme", "VerInformeEmpleadosxDepartamento", "empleado", "", new { @class = "btn btn-primary" })
+
+</div>
+
+
+<style>
+    .left {
+        text-align: left;
+    }
+
+    .right {
+        text-align: right;
+    }
+
+    .center {
+        text-align: center;
+    }
+</style>
+
+
+
+
+
+
+
+@section scripts
+{
+    <script src="~/Scripts/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/moment.js"></script>
+    <script>
+      $(document).ready(function ()
+      {
+          $('[data-toggle="tooltip"]').tooltip()
+    
+          var oTable = $('#tablaEmpleados').DataTable(
+              {
+              "searching": false,
+              "paging": false,
+              language: {
+                  decimal: ",",
+                  processing:     "Procesando...",
+                  search:         "Buscar:",
+                  lengthMenu:    "",
+                  info:           "",
+                  infoEmpty:      "",
+                  infoFiltered:   "",
+                  infoPostFix:    "",
+                  loadingRecords: "",
+                  zeroRecords:    "",
+                  emptyTable:     "",
+                  paginate: {
+                      first:      "Primero",
+                      previous:   "Anterior",
+                      next:       "Siguiente",
+                      last:       "Ultimo"
+                  },
+                  aria: {
+                      sortAscending:  ": activer pour trier la colonne par ordre croissant",
+                      sortDescending: ": activer pour trier la colonne par ordre décroissant"
+                  }
+              },
+                   "ajax": {
+                       "url": '/empleado/getEmpleadoxEmpresaxAreaXDepartamento',
+                       "type" : "get",
+                       "datatype" : "json"
+                   },
+                   "columns": [
+                       { "data": "codigoCorp", width: 5 },
+                       { "data": "codigo", width: 5, "class": "hidden" },
+                       { "data": "empresa", width: 5, "class": "hidden" },
+                       { "data": "estacion", width: 5, "class": "hidden" },
+                       { "data": "area", width: 5, "class": "hidden" },
+                       { "data": "departamento", width: 5, "class": "hidden" },
+                       { "data": "primerNombre", "autoWidth": true },
+                       { "data": "segundoNombre", "autoWidth": true },
+                       { "data": "tercerNombre", "autoWidth": true },
+                       { "data": "primerApellido", "autoWidth": true },
+                       { "data": "segundoApellido", "autoWidth": true },
+                       { "data": "apellidoCasada", "autoWidth": true },
+                       { "data": "descPuesto", width: 450 },
+                       { "data": "salario", "autoWidth": true, "className": "right", "type": "numeric-comma", targets: 3 },
+                       { "data": "fechaIngreso", "type": "date ",
+                            "render": function (value) {
+                                if (value === null) return "";
+                                var pattern = /Date\(([^)]+)\)/;//date format from server side
+                                var results = pattern.exec(value);
+                                var dt = new Date(parseFloat(results[1]));
+
+                                return dt.getDate() + "/" + (dt.getMonth() + 1) + "/" + dt.getFullYear();
+                            }, "autoWidth": true
+                       },
+                        {
+                            "data": "codigoCorp", "width": "10", "render": function (data, type, full) {
+                                return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Editar Empleado"  href="/empleado/editar/1?codigo=' + full.codigoCorp + ' "> <span class="glyphicon glyphicon-pencil"></span></a>';
+                            }
+                        },
+                       {
+                              "data": "codigoCorp", "width": "10", "render": function (data, type, full) {
+                                  return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Trasladar Empleado"  href="/empleado/trasladar/1?codigocorp=' + full.codigoCorp + '&codigo=' + full.codigo + '&empresa=' + full.empresa + '&estacion=' + full.estacion + '&area=' + full.area + '&departamento=' + full.departamento + '&puesto=' + full.codPuesto + '&salario=' + full.salario + ' "> <span class="glyphicon glyphicon-transfer"></span></a>';
+                              }
+                       },
+                       {
+                           "data": "codigoCorp", "width": "10", "render": function (data, type, full) {
+                               return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Trasladar de Empresa Empleado"  href="/empleado/trasladarempresa/1?codigocorp=' + full.codigoCorp + '&codigo=' + full.codigo + '&empresa=' + full.empresa + '&estacion=' + full.estacion + '&area=' + full.area + '&departamento=' + full.departamento + '&puesto=' + full.codPuesto + '&salario=' + full.salario + ' "> <span class="glyphicon glyphicon-random"></span></a>';
+                           }
+                       },
+                        {
+                            "data": "codigoCorp", "width": "10", "render": function (data, type, full) {
+                                return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Eliminar Empleado"  href="/empleado/eliminar/1?codigo=' + full.codigoCorp + '&nombre=' + full.primerNombre + ' "> <span class="glyphicon glyphicon-trash"></span></a>';
+                            }
+                        }
+                      
+                   ]
+                })
+          // -- Eventos Clicks
+          // -- Boton con Vista Parcial
+          $('.tablecontainer').on('click', 'a.popup', function (e)
+          {
+              e.preventDefault();
+              OpenPopup($(this).attr('href'));
+          })
+
+          // -- Boton sin Vista
+          $('.tablecontainer').on('click', 'a.popup1', function (e)
+          {
+              e.preventDefault();
+              var url = $(this).attr('href')
+              $.ajax({
+                  type: "POST",
+                  url: url,
+                  success: function (data)
+                  {
+                      if (data.status)
+                      {
+
+                          oTable.ajax.reload();
+                       
+                      }
+                  }
+              })
+          })
+
+          // --Popup
+          function OpenPopup(pageUrl)
+          {
+              var $pageContent = $('<div/>');
+              $pageContent.load(pageUrl, function ()
+              {
+              });
+              // -- Abrir Dialogo
+              $dialog = $('<div class="popupWindow" style="overflow:auto"></div>')
+                        .html($pageContent)
+                        .dialog(
+                        {
+                            draggable: true,
+                            autoOpen: false,
+                            resizable: false,
+                            model: true,
+                            title: '',
+                            height: 'auto',
+                            width: 800,
+                            close: function ()
+                            {
+                                $dialog.dialog('destroy').remove();
+                            }
+                        })
+              // -- Enviar Formulario
+              $('.popupWindow').on('submit', '#popupForm', function (e)
+              {
+                  var url = $('#popupForm')[0].action;
+                  $.ajax({
+                      type: "POST",
+                      url: url,
+                      data: $('#popupForm').serialize(),
+                      success: function (Data) {
+                          if (Data.retorno >= 1) {
+                              $dialog.dialog('close');
+                              oTable.ajax.reload();
+
+                              alert("Operacion exitosa ");
+                          }
+                          else
+                          {
+                              alert(Data.mensaje);
+                          }
+                      }
+                  })
+                  e.preventDefault();
+              })
+              $dialog.dialog('open');
+          }
+
+
+      });
+
+    </script>
+}

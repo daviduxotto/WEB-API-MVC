@@ -1,0 +1,94 @@
+﻿@model Entidades.eMovimientoEfectivoDet
+
+@using (Html.BeginForm("guardarReversar", "movimientoefectivo", FormMethod.Post, new { id = "popupForm" }))
+{
+
+
+<div class="form-horizontal">
+    <h2>Reversar documento</h2>
+    Complete los siguientes datos para realizar la reversión del documento  No.
+    <br />
+    <strong>@Model.codDocumento</strong>
+    <hr />
+
+    <div class="form-group">
+
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="control-label col-md-2" for="codDoctoBancoReversion" style="text-align:right">Tipo Docto.</label>
+                <div class="col-md-10">
+                    @Html.DropDownListFor(m => m.codDoctoBancoReversion, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control col-md-4" })
+                    @Html.ValidationMessageFor(model => model.codDoctoBancoReversion, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="control-label col-md-2" for="codDocumentoReversion" style="text-align:right">No. Docto.</label>
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.codDocumentoReversion, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.codDocumentoReversion, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="control-label col-md-2" for="montoReversion" style="text-align:right">Monto Q.</label>
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.montoReversion, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.montoReversion, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="control-label col-md-2" for="concepto" style="text-align:right">Concepto</label>
+                <div class="col-md-10">
+                    @Html.TextAreaFor(model => model.concepto, 3, 40, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.concepto, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="form-horizontal">
+            <div class="form-group">
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.codBanco, new { htmlAttributes = new { @class = "hidden" } })
+                    @Html.EditorFor(model => model.codCuenta, new { htmlAttributes = new { @class = "hidden" } })
+                    @Html.EditorFor(model => model.codDoctoBanco, new { htmlAttributes = new { @class = "hidden" } })
+                    @Html.EditorFor(model => model.codDocumento, new { htmlAttributes = new { @class = "hidden" } })
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Guardar" class="btn btn-primary" />
+        </div>
+    </div>
+</div>
+}
+
+<script src="~/Scripts/moment.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+@section scripts {
+    <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // ----- obtener documentos negativos
+            $.getJSON('/movimientoefectivo/getDoctoBancoNegativo', { codCuenta: $('#codCuenta').val(), codBanco: $('#codBanco').val() }, function (data) {
+                $.each(data, function () {
+                    $('#codDoctoBancoReversion').append('<option value=' +
+                        this.codDoctoBanco + '>' + this.descDoctoBanco + '</option>');
+                });
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert('Error al obtener Documentos!');
+            });
+        });
+    </script>
+
+}

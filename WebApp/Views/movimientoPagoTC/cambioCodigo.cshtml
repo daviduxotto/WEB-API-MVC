@@ -1,0 +1,41 @@
+﻿@model Entidades.eMovimientoPagoTC
+
+@using (Html.BeginForm("guardarCambioCodigo", "movimientoPagoTC", FormMethod.Post, new { id = "popupForm" }))
+{   
+      <h4>Documento No. @ViewBag.documento</h4>
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.EditorFor(model => model.codBancoAnterior, new { htmlAttributes = new { @class = "hidden" } })
+        @Html.EditorFor(model => model.codCuentaAnterior, new { htmlAttributes = new { @class = "hidden" } })
+        @Html.EditorFor(model => model.codDoctoBancoAnterior, new { htmlAttributes = new { @class = "hidden" } })
+        @Html.EditorFor(model => model.codDocumentoAnterior, new { htmlAttributes = new { @class = "hidden" } })
+        @Html.EditorFor(model => model.codBanco, new { htmlAttributes = new { @class = "hidden" } })
+        @Html.EditorFor(model => model.codCuenta, new { htmlAttributes = new { @class = "hidden" } })
+        @Html.EditorFor(model => model.codDoctoBanco, new { htmlAttributes = new { @class = "hidden" } })
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="codDocumento">No. Documento</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.codDocumento, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(m => m.codDocumento)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+}
+
+
+@section scripts
+{
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+    
+    </script>
+}

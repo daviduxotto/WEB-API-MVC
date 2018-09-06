@@ -1,0 +1,45 @@
+﻿@model Entidades.eEmpleado
+
+
+<h3>Detalle de Baja</h3>
+@Html.DisplayFor(model => model.primerNombre)
+
+<table class="table" id="popupForm" style="width:800px">
+    <tr>
+        <th class="input-group-sm">
+           Empresa
+        </th>
+        <th class="input-group-sm">
+           Sucursal
+        </th>
+        <th class="input-group-sm">
+           Fecha
+        </th>
+        <th>
+            Tipo de Baja
+        </th>
+        <th class="input-group-sm">
+           Observacion
+        </th>
+     
+    </tr>
+
+        <tr>
+
+            <td class="input-group-sm">
+                @Html.DisplayFor(model => model.descEmpresa)
+
+            </td>
+            <td class="input-group-sm">
+                @Html.DisplayFor(model => model.descEstacion)
+            </td>
+            <td class="input-group-sm">
+                @Html.DisplayFor(model => model.fechaBaja)
+            </td>
+            <td>   @Html.DisplayFor(model => model.descTipoBaja)</td>
+            <td>
+                @Html.DisplayFor(model => model.observacion)
+            </td>
+        </tr>
+
+</table>

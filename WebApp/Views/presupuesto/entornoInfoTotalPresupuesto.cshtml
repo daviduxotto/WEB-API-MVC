@@ -1,0 +1,102 @@
+﻿@model  Entidades.ePresupuesto
+
+<div class="container">
+
+    @using (Html.BeginForm("VerInformeTotalizadoPresupuesto", "presupuesto", FormMethod.Post))
+    {
+    @Html.AntiForgeryToken()
+
+    <h4>Estado de Resultados Presupuestario</h4>
+    <div class="form-horizontal">
+        <div class="form-group">
+            <label class="control-label col-md-2">Año</label>
+            <div class="col-md-2">
+                <label class="control-label col-md-2">@Session["aniopresupuesto"].ToString()</label>
+                @Html.EditorFor(m => m.anio, new { htmlAttributes = new { @Value = @Session["aniopresupuesto"].ToString(), @class = "hidden" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="tipoPresupuesto">Tipo de Presupuesto</label>
+            <div class="col-md-4">
+                @Html.DropDownListFor(m => m.tipoPresupuesto, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control col-md-4" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2" for="grupoPresupuesto" style="text-align:right">Grupo Presupuesto</label>
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.grupoPresupuesto, new List<SelectListItem> { new SelectListItem { Text = "RETAIL", Value = "RETA" }, new SelectListItem { Text = "DISTRIBUIDORA", Value = "DIST" } }, htmlAttributes: new { @class = "form-control col-md-4" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2" for="subGrupoPresupuesto">Subgrupo Presupuesto</label>
+            <div class="col-md-4">
+                @Html.DropDownListFor(m => m.subGrupoPresupuesto, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control col-md-4" })
+            </div>
+        </div>
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="control-label col-md-2" for="mes" style="text-align:right">Mes</label>
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.mes, new List<SelectListItem> { new SelectListItem { Text = "ENERO", Value = "01" }, new SelectListItem { Text = "FEBRERO", Value = "02" }, new SelectListItem { Text = "MARZO", Value = "03" }, new SelectListItem { Text = "ABRIL", Value = "04" }, new SelectListItem { Text = "MAYO", Value = "05" }, new SelectListItem { Text = "JUNIO", Value = "06" }, new SelectListItem { Text = "JULIO", Value = "07" }, new SelectListItem { Text = "AGOSTO", Value = "08" }, new SelectListItem { Text = "SEPTIEMBRE", Value = "09" }, new SelectListItem { Text = "OCTUBRE", Value = "10" }, new SelectListItem { Text = "NOVIEMBRE", Value = "11" }, new SelectListItem { Text = "DICIEMBRE", Value = "12" }, }, htmlAttributes: new { @class = "form-control col-md-4" })
+                </div>
+            </div>
+        </div>
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="control-label col-md-2" for="formatoInforme" style="text-align:right">Formato</label>
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.formatoInforme, new List<SelectListItem> { new SelectListItem { Text = "PDF", Value = "PDF" }, new SelectListItem { Text = "EXCEL", Value = "EXCEL" } }, htmlAttributes: new { @class = "form-control col-md-4" })
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-4">
+                <input type="submit" value="Imprimir" class="btn btn-primary" />
+                @Html.ActionLink("Regresar", "index", "home", "", new { @class = "btn btn-danger" })
+            </div>
+        </div>
+    </div>
+    }
+
+</div>
+
+@section scripts
+{
+
+    <script>
+        $(document).ready(function () {
+            // ----- obtener tipo de presupuesto
+            $.getJSON('/presupuesto/getTipoPresupuesto', null, function (data) {
+                $.each(data, function () {
+                    $('#tipoPresupuesto').append('<option value=' +
+                      this.codigo + '>' + this.codigo + '</option>');
+                });               
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert('Error al obtener tipo de presupuestos!');
+            });
+
+            cargarDatosSubGrupo();
+
+            $('#grupoPresupuesto').change(function () {
+                cargarDatosSubGrupo();
+
+            });
+            
+            function cargarDatosSubGrupo() {
+                var grupoPresto = $('#grupoPresupuesto').val();
+                $('#subGrupoPresupuesto option').remove();
+
+                if (grupoPresto == "RETA") {                    
+                    $('#subGrupoPresupuesto').append('<option value=' + 'ES' + '>' + 'ES' + '</option>');
+                    $('#subGrupoPresupuesto').append('<option value=' + 'TC' + '>' + 'TC' + '</option>');
+                    $('#subGrupoPresupuesto').append('<option value=' + 'CW' + '>' + 'CW' + '</option>');
+                } else {
+                    $('#subGrupoPresupuesto').append('<option value=' + 'VT' + '>' + 'VENTAS' + '</option>');
+                }
+            }
+            
+         
+        });
+    </script>
+}

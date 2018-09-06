@@ -1,0 +1,445 @@
+﻿
+@model  Tuple<List<Entidades.eInformeDBR>, List<Entidades.eControlCalidad>>
+
+@{
+    ViewBag.Title = "Recepción de Documentos";
+    string temporal = "";
+}
+
+
+@if (ViewBag.retorno != null)
+{
+    if (Convert.ToInt32(ViewBag.retorno) >= 1)
+    {
+        <div class="alert alert-info">@ViewBag.mensaje</div>
+    }
+    else
+    {
+        <div class="alert alert-warning">@ViewBag.mensaje</div>
+    }
+}
+<h3>Recepción de Documentos de Estación de Servicio</h3>
+<input type="button" value="Iniciar Validación" class="col-md-3 btn btn-primary" id="btnAbrir" />
+<br /><br />
+<div class="contenedor">
+    <table class="table table-bordered  bg-info">
+        <tbody>
+            <tr>
+                <th class="input-sm" scope="row">Empresa: @ViewBag.empresa</th>
+                <th class="input-sm" scope="row">Sucursal: @ViewBag.estacion</th>
+                <th class="input-sm" scope="row">Fecha: @Convert.ToDateTime(@ViewBag.dia).ToShortDateString()</th>
+
+            </tr>
+        </tbody>
+    </table>
+
+
+
+
+    @using (Html.BeginForm("saveInformeDBR", "informedbr", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                <table class="table table-striped table-bordered">
+                    @{ int j = 0; }
+                    <tr>
+                        <th class="bg-info">ITEM</th>
+                        <th class="bg-info">CONTROL DE CALIDAD</th>
+                        <th class="bg-info">APROBADO</th>
+                    </tr>
+                    @foreach (var control in Model.Item2)
+                    {
+                        j++;
+                        //oculto info al usuario
+                        @Html.TextBoxFor(tuple => tuple.Item2[j - 1].codControlCalidad, new { @class = "hidden" })
+                        @Html.TextBoxFor(tuple => tuple.Item2[j - 1].codEmpresa, new { @class = "hidden" })
+                        @Html.TextBoxFor(tuple => tuple.Item2[j - 1].codEstacion, new { @class = "hidden" })
+                        @Html.TextBoxFor(tuple => tuple.Item2[j - 1].dia, new { @class = "hidden" })
+                        <tr>
+                            <th scope="row">@j</th>
+                            <td>
+                                @System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(control.descControlCalidad.ToLower())
+                            </td>
+                            <td>
+                                @if (control.aprobado == true)
+                                {
+                                    @Html.CheckBoxFor(tuple => tuple.Item2[j - 1].aprobado, new { @checked = "cheked", @class = "custom-control-input" });
+                                }
+                                else
+                                {
+                                    @Html.CheckBoxFor(tuple => tuple.Item2[j - 1].aprobado, new { @class = "custom-control-input" });
+                                }
+                            </td>
+                            <td class="">
+
+                                @if (control.observacionesUV == true)
+                                {
+                                    <a class="btn btn-success" href="#observacionModal2@(j)" data-toggle="modal" data-placement="top" title="Observacion"> <span class="glyphicon glyphicon-comment"></span></a>
+                                }
+                                else
+                                {
+                                    <a class="btn btn-default" href="#observacionModal2@(j)" data-toggle="modal" data-placement="top" title="Observacion"> <span class="glyphicon glyphicon-comment"></span></a>
+                                }
+
+
+                                <div class="modal fade" id="observacionModal2@(j)" role="dialog">
+                                    <div class="modal-dialog">
+
+
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                <h4 class="modal-title">Observaciones</h4>
+                                                <h5>@System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(control.descControlCalidad.ToLower())</h5>
+                                            </div>
+                                            <div class="modal-body">
+                                                @Html.TextAreaFor(tuple => tuple.Item2[j - 1].observaciones, new { @class = "form-control" })
+
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </td>
+                        </tr>
+                    }
+                </table>
+                <table class="table table-striped table-bordered">
+                    @{ int i = 0;}
+                    <tr>
+                        <th class="bg-info">ITEM</th>
+                        <th class="bg-info">NOMBRE DEL INFORME</th>
+                        <th class="bg-info">RECIBIDO</th>
+                        <th class="bg-info">NO APLICA</th>
+                        <th class="hidden"></th>
+                    </tr>
+                    
+                    @foreach (var informes in Model.Item1)
+                    {
+                        i++;
+
+                        //oculto info al usuario
+                        @Html.TextBoxFor(tuple => tuple.Item1[i - 1].codInforme, new { @class = "hidden" })
+                        @Html.TextBoxFor(tuple => tuple.Item1[i - 1].codEmpresa, new { @class = "hidden" })
+                        @Html.TextBoxFor(tuple => tuple.Item1[i - 1].codEstacion, new { @class = "hidden" })
+                        @Html.TextBoxFor(tuple => tuple.Item1[i - 1].dia, new { @class = "hidden" })
+                    <tr>                        
+                         @if (informes.descGrupo == temporal)
+                         {
+                             <th colspan="5" class="hidden">@informes.descGrupo</th> 
+                         }
+                         else
+                         {
+                             <th colspan="5" class="bg-success">@informes.descGrupo</th>
+                             temporal = informes.descGrupo;
+                         }
+
+                    </tr>
+                        <tr>
+                            <th scope="row">@i</th>
+                            <td>
+                                @System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(informes.descInforme.ToLower())
+                            </td>
+                            <td>
+                                @if (informes.recibido == true)
+                                {
+                                    @Html.CheckBoxFor(tuple => tuple.Item1[i - 1].recibido, new { @checked = "cheked", @class = "checkDocumento" });
+
+                                }
+                                else
+                                {
+                                    @Html.CheckBoxFor(tuple => tuple.Item1[i - 1].recibido, new { @class = "checkDocumento" });
+                                }
+
+                            </td>
+                            <td>
+                                @if (informes.obligatorio == false)
+                                {
+                                    if (informes.noAplica == true)
+                                    {
+                                        @Html.CheckBoxFor(tuple => tuple.Item1[i - 1].noAplica, new { @checked = "cheked", @class = "checkDocumento" });
+                                    }
+                                    else
+                                    {
+                                        @Html.CheckBoxFor(tuple => tuple.Item1[i - 1].noAplica, new { @class = "checkDocumento" });
+                                    }
+                                }
+                            </td>
+                            <td class="">
+
+                                @if (informes.observacionesUV == true)
+                                {
+                                    <a class="btn btn-success" href="#observacionModal@(i)" data-toggle="modal" data-placement="top" title="Observacion"> <span class="glyphicon glyphicon-comment"></span></a>
+                                }
+                                else
+                                {
+                                    <a class="btn btn-default" href="#observacionModal@(i)" data-toggle="modal" data-placement="top" title="Observacion"> <span class="glyphicon glyphicon-comment"></span></a>
+                                }
+
+
+                                <div class="modal fade" id="observacionModal@(i)" role="dialog">
+                                    <div class="modal-dialog">
+
+
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                <h4 class="modal-title">Observaciones</h4>
+                                                <h5>@System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(informes.descInforme.ToLower())</h5>
+                                            </div>
+                                            <div class="modal-body">
+                                                @Html.TextAreaFor(tuple => tuple.Item1[i - 1].observaciones, new { @class = "form-control" })
+
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+
+                    }
+                </table>
+                <hr />
+
+                <div>
+
+                    <input type="submit" value="Guardar" class="btn btn-primary" />
+                    <div id="botonera">
+                        <input type="button" value="Finalizar Validación" class="col-md-3 btn btn-danger" id="btnFinalizar" />
+                        <br />
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+        <div class="tablecontainer">            
+            <hr />
+            <h3>Observaciones</h3>
+            @Html.ActionLink("Agregar Observación", "nuevaObservacion", "observacionUV", new { pantalla = "01" }, new { @class = "popup btn btn-primary" })
+            @Html.ActionLink("Informe de observaciones", "verInformeObservacionPantalla", "observacionUV", new { pantalla = "01" }, new { @class = "btn btn-primary" })
+            <br />
+            <div id="divObservacion">
+
+            </div>
+            <hr />
+        </div>
+</div>
+
+@Html.ActionLink("Salir", "index", "home", "", new { @class = "btn btn-danger" })
+@Html.Partial("btnUV")
+@Html.ActionLink("Avanzar", "edit", "movimientoefectivo", "", new { @class = "btn btn-primary" })
+
+<style>
+    .modal-content textarea.form-control {
+        width: 100%;
+    }
+</style>
+
+@section scripts
+{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+    <script>
+        $('.dropdown').hover(function () {
+            $('.dropdown-toggle', this).trigger('click');
+        });
+        $(document).ready(function () {
+            obtenerEstado();
+            cargarObservaciones();
+            $(".checkDocumento").on('click', function () {
+                var elemento = '#' + $(this).attr("id");
+
+                var encabezado = elemento.substring(0, 9);
+                var subEncabezado = elemento.substring(1, 8);
+                var pie = elemento.substring(10, 14);
+                var ultimoCarEncabezado = elemento.substring(8, 9);
+                var noAplica = pie.includes('oA');
+                var recibido = pie.includes('ec');
+                var itemNoSeleccionable;
+
+                if (recibido == true) {
+                    if (ultimoCarEncabezado == "_") {
+                        itemNoSeleccionable = encabezado + '_noAplica';
+                    } else {
+                        itemNoSeleccionable = encabezado + '__noAplica';
+                    }
+                }
+                if (noAplica == true) {
+                    if (ultimoCarEncabezado == "_") {
+                        itemNoSeleccionable = encabezado + '_recibido';
+                    } else {
+                        itemNoSeleccionable = encabezado + '__recibido';
+                    }
+                }
+                $(itemNoSeleccionable).prop('checked', false);
+            }); //fin funcion clic checkbox
+
+            // -- Eventos Clicks
+            // -- Boton con Vista Parcial
+            $('.tablecontainer').on('click', 'a.popup', function (e) {
+                e.preventDefault();
+                OpenPopup($(this).attr('href'));
+            })
+
+            // -- Boton sin Vista
+            $('.tablecontainer').on('click', 'a.popup1', function (e) {
+                e.preventDefault();
+                var url = $(this).attr('href')
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    success: function (data) {
+                        if (data.status) {
+                        }
+                    }
+                })
+            })
+
+            // --Popup
+            function OpenPopup(pageUrl) {
+                var $pageContent = $('<div/>');
+                $pageContent.load(pageUrl, function () {
+                });
+                // -- Abrir Dialogo
+                $dialog = $('<div class="popupWindow" style="overflow:auto"></div>')
+                    .html($pageContent)
+                    .dialog(
+                    {
+                        draggable: true,
+                        autoOpen: false,
+                        resizable: false,
+                        model: true,
+                        title: '',
+                        height: 'auto',
+                        width: 600,
+                        close: function () {
+                            $dialog.dialog('destroy').remove();
+                        }
+                    })
+                // -- Enviar Formulario
+                $('.popupWindow').on('submit', '#popupForm', function (e) {
+                    var url = $('#popupForm')[0].action;
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: $('#popupForm').serialize(),
+                        success: function (data) {
+                            if (data.salida.retorno >= 1) {
+                                $dialog.dialog('close');
+                                cargarObservaciones();
+
+                            } else {
+                                $.notify(data.salida.mensaje, "warn");
+                            }
+                            obtenerEstado();
+                        }
+                    })
+                    e.preventDefault();
+                })
+                $dialog.dialog('open');
+            }
+
+            function cargarObservaciones() {
+                $.ajax({
+                    type: "POST",
+                    url: '/observacionUV/getObservacionUV/id=1?codPantalla=01',
+                    success: function (data) {
+                        $('#divObservacion').empty();
+                        $('#divObservacion').append('<table class="table table-bordered" id="tblObservacion">'
+                            +
+                            '<tr><th class="hidden">Codigo</th><th width=700>Descripción</th><th>Usuario</th><th class="hidden">Tipo</th><th>Fecha</th><th>Acción</th></tr>'
+                        );
+                        $.each(data, function () {
+                            if (this.tipoObservacion == "M") {
+                                $('#tblObservacion').append(
+                                    '<tr><td class="hidden">' + this.codObservacion + '</td><td width=700>' + this.descripcion + '</td><td>' + this.usuario + '</td><td class="hidden">' + this.tipoObservacion + '</td><td>' + this.fecha + '</td><td><a class="popup" data-toggle="tooltip" data-placement="top" title="Eliminar Observación"  href="/observacionUV/eliminar/1?codObservacion=' + this.codObservacion + '"> <span class="glyphicon glyphicon-trash"></span></a></td></tr>'
+                                );
+                            } else {
+                                $('#tblObservacion').append(
+                                    '<tr><td class="hidden">' + this.codObservacion + '</td><td width=700>' + this.descripcion + '</td><td>' + this.usuario + '</td><td class="hidden">' + this.tipoObservacion + '</td><td>' + this.fecha + '</td></tr>'
+                                );
+                            }
+
+                        });
+                        $('#divObservacion').append('</table>');
+                    }
+                })
+            }
+
+            $("#btnAbrir").on('click', function () {
+                abrirVentana();
+            });
+
+            $("#btnFinalizar").on('click', function () {
+                cerrarVentana();
+            });
+
+
+            function obtenerEstado() {
+                $.ajax({
+                    type: "POST",
+                    url: '/informedbr/getEstadoPantalla',
+                    success: function (data) {
+                        if (data.salida.retorno >= 1) {
+                            $(".contenedor *").attr('disabled', false); // Habilita los controles
+                            $('#botonera').show();
+                        }
+                        else {                            
+                            $(".contenedor *").attr('disabled', true);//Inhabilita los controles
+                            $('#botonera').hide();
+                        }
+                        cargarObservaciones();
+                    }
+                });
+            }
+            function abrirVentana() {
+                $.ajax({
+                    type: "POST",
+                    url: '/informedbr/abrirPantallaUV',
+                    success: function (data) {
+                        if (data.salida.retorno >= 1) {
+                            obtenerEstado();
+                        }
+                        else {
+                            $.notify(data.salida.mensaje, "warn");
+                            obtenerEstado();
+                        }
+                    }
+                });
+            }
+
+            function cerrarVentana() {
+                $.ajax({
+                    type: "POST",
+                    url: '/informedbr/cerrarPantallaUV',
+                    success: function (data) {
+                        if (data.salida.retorno >= 1) {
+                            obtenerEstado();
+                        }
+                        else {
+                            $.notify(data.salida.mensaje, "warn");
+                            obtenerEstado();
+                        }
+                    }
+                });
+            }
+
+
+        });
+
+    </script>
+}

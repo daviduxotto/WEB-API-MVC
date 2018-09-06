@@ -1,0 +1,19 @@
+﻿<!-- boton ir a -->
+<div class="btn-group dropup">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+        Ir a
+    </button>
+    <ul class="dropdown-menu">
+        <li>@Html.ActionLink("Cambiar Entorno", "entorno", "usuario", "", new { @class = "dropup" })</li>
+        <li>@Html.ActionLink("Establecer Día de Trabajo", "elegirDia", "usuario", "", new { @class = "dropdown-item " }) </li>
+        <li>@Html.ActionLink("Recepcion DBR", "edit", "informedbr", "", new { @class = "dropup" })</li>
+        <li>@Html.ActionLink("Movimiento Efectivo", "edit", "movimientoefectivo")</li>
+        <li>@Html.ActionLink("Movimiento Tarjeta Crédito", "edit", "movimientotc")</li>
+        <li>@Html.ActionLink("Validación Cupones", "vercupones", "cupon")</li>
+        <li>@Html.ActionLink("Pagos de Clientes Crédito", "edit", "movimientopagocc")</li>
+        <li>@Html.ActionLink("Pagos de Clientes Crédito con Tarjeta De Crédito", "edit", "movimientoPagoTC", "", new { @class = "dropdown-item" })</li>
+        <li>@Html.ActionLink("Caja chica", "edit", "facturaCajaChica", "", new { @_class = "dropdown-item" })</li>
+        <li>@Html.ActionLink("Otros documentos", "edit", "doctoOtros", "", new { @_class = "dropdown-item" })</li>
+    </ul>
+</div>
+<!-- fin boton ir a-->

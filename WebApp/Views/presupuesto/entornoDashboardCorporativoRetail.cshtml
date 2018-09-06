@@ -1,0 +1,43 @@
+﻿@model  Entidades.ePresupuesto
+
+<div class="container">
+
+    @using (Html.BeginForm("VerDashboardCorporativoRetail", "presupuesto", FormMethod.Post))
+    {
+    @Html.AntiForgeryToken()
+
+    <h4>Informe de Presupuesto Corporativo Retail</h4>
+   
+    <div class="form-horizontal">
+        <div class="form-group">
+            <p class="col-md-7">Este informe proporciona un resumen gráfico del volumen de galones presupuestados por el departamento comparando con lo que se ha ejecutado en el transcurso de los meses</p>
+            <br />
+            <label class="control-label col-md-2 hidden">Año</label>
+            <div class="col-md-2">
+                <label class="control-label col-md-2 hidden">@Session["aniopresupuesto"].ToString()</label>
+                @Html.EditorFor(m => m.anio, new { htmlAttributes = new { @Value = @Session["aniopresupuesto"].ToString(), @class = "hidden" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-4">
+                <input type="submit" value="Imprimir" class="btn btn-primary" />
+                @Html.ActionLink("Regresar", "index", "home", "", new { @class = "btn btn-danger" })
+            </div>
+        </div>
+
+    </div>
+    }
+
+</div>
+
+@section scripts
+{
+
+    <script>
+        $(document).ready(function () {
+      
+         
+        });
+    </script>
+}

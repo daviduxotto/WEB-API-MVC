@@ -1,0 +1,184 @@
+﻿@model List<Entidades.eEmpleado>
+@{
+    ViewBag.Title = "empleados";
+}
+<br />
+<br />
+<h3>Búsqueda de  Empleados</h3>
+<div class="table table-striped tablecontainer">
+
+    <table id="tablaEmpleados" class="cell-border compact stripe">
+        <thead class="bg-info">
+            <tr>
+
+                <th class="input-sm">Cod.</th>
+                <th class="input-sm">Nombre</th>
+                <th class="input-sm">Empresa</th>
+                <th class="input-sm">Sucursal</th>
+                <th class="input-sm">Puesto</th>
+                <th class="input-sm">Ingreso</th>
+                <th class="input-sm">Egreso</th>
+                <th class="input-sm">DPI</th>
+                <th class="input-sm">Salario</th>
+                
+                <th class="input-sm">Nacimiento</th>
+                <th class="input-sm">Estado</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+    </table>
+    <hr />
+    @Html.ActionLink("Salir", "index", "home", "", new { @class = "btn btn-danger" })
+
+</div>
+
+
+<style>
+    .left {
+        text-align: left;
+    }
+
+    .right {
+        text-align: right;
+    }
+
+    .center {
+        text-align: center;
+    }
+    td {
+        font-size: 12px;
+    }
+</style>
+
+
+
+
+
+
+
+@section scripts
+{
+    <script src="~/Scripts/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/moment.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+
+            var oTable = $('#tablaEmpleados').DataTable(
+                {
+                    "searching": true,
+                    "paging": true,
+    
+                    language: {
+                        decimal: ",",
+                        processing: "Procesando...",
+                        search: "Buscar:",
+                        lengthMenu: "",
+                        info: "",
+                        infoEmpty: "",
+                        infoFiltered: "",
+                        infoPostFix: "",
+                        loadingRecords: "",
+                        zeroRecords: "",
+                        emptyTable: "",
+                        paginate: {
+                            first: "Primero",
+                            previous: "Anterior",
+                            next: "Siguiente",
+                            last: "Ultimo"
+                        },
+                        aria: {
+                            sortAscending: ": activer pour trier la colonne par ordre croissant",
+                            sortDescending: ": activer pour trier la colonne par ordre décroissant"
+                        }
+                    },
+                    "ajax": {
+                        "url": '/empleado/getallempleados',
+                        "type": "get",
+                        "datatype": "json"
+                    },
+                    "columns": [
+                        { "data": "codigoCorp", width: 30 },
+                        { "data": "nombreCompleto", width:250 },
+                        { "data": "descEmpresa", width: 120},
+                        { "data": "descEstacion", width: 100 },                     
+                        { "data": "descPuesto", width: 100 },
+                        {
+                            "data": "fechaIngreso", "type": "date ",
+                            "render": function (value) {
+                                if (value === null) return "";
+                                var pattern = /Date\(([^)]+)\)/;//date format from server side
+                                var results = pattern.exec(value);
+                                var dt = new Date(parseFloat(results[1]));
+                                return dt.getDate() + "/" + (dt.getMonth() + 1) + "/" + dt.getFullYear();
+                            }, Width: 50
+                        },
+                            {
+                                "data": "StrfechaBaja",
+                                Width: 75
+                            },
+                        { "data": "dpi", width: 100 },
+                        { "data": "salario", width: 150 },
+                
+                        {
+                            "data": "StrfechaNacimiento",
+                             Width: 50
+                        },
+                        {
+                            "data": "estado", width: 30,
+                             "render": function (data, type, full) {
+                                if (data == "A") {
+                                    return '<a href="#"><span class="glyphicon glyphicon-ok"></span> </a>';
+                                }
+                                else {
+                                    return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Detalle de Baja"  href="/empleado/bajaempleado/1?codigocorp=' + full.codigoCorp + ' "> <span class="glyphicon glyphicon-ban-circle"></span></a>';                            
+                                }
+
+                            }, className: "center"
+                        },
+                        {
+                            "data": "codigoCorp", "width": "10", "render": function (data, type, full) {
+                                return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Historial de Traslados"  href="/trasladoempleado/trasladoempleados/1?codigocorp=' + full.codigoCorp + ' "> <span class="glyphicon glyphicon-time"></span></a>';
+                            }
+                        },
+                         {
+                             "data": "codigoCorp", "width": "10", "render": function (data, type, full) {
+                                 return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Ver Informacion"  href="/empleado/ver/1?codigo=' + full.codigoCorp + ' "> <span class="glyphicon glyphicon-info-sign"></span></a>';
+                             }
+                         }
+                    ]
+                })
+         
+            // -- Boton con Vista Parcial
+            $('.tablecontainer').on('click', 'a.popup', function (e) {
+                e.preventDefault();
+                OpenPopup($(this).attr('href'));
+            })
+            // --Popup
+            function OpenPopup(pageUrl) {
+                var $pageContent = $('<div/>');
+                $pageContent.load(pageUrl, function () {
+                });
+                // -- Abrir Dialogo
+                $dialog = $('<div class="popupWindow" style="overflow:auto"></div>')
+                    .html($pageContent)
+                    .dialog(
+                    {
+                        draggable: true,
+                        autoOpen: false,
+                        resizable: false,
+                        model: true,
+                        title: '',
+                        height: 'auto',
+                        width: 800,
+                        close: function () {
+                            $dialog.dialog('destroy').remove();
+                        }
+                    })           
+                $dialog.dialog('open');
+            }
+        });
+
+    </script>
+}

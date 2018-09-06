@@ -1,0 +1,62 @@
+﻿@model Entidades.eMovimientoEfectivoDet
+
+@using (Html.BeginForm("guardarConciliar", "movimientoefectivo", FormMethod.Post, new { id = "popupForm" }))
+{
+
+
+<div class="form-horizontal">
+    <h2>Conciliar</h2>
+   Ingrese fecha correspondiente al estado de cuenta del banco
+    <hr />
+
+    <div class="form-group">
+
+        <div class="control-label col-md-2"> Fecha </div>
+        <div class="col-md-10">
+            <label class="hidden" id="fechaBanco2">@Convert.ToDateTime(@ViewBag.dia).ToString("MM/dd/yyyy")</label>
+            @Html.EditorFor(model => model.dia, new { htmlAttributes = new { @class = "hidden" } })
+            
+            @Html.EditorFor(model => model.codBanco, new { htmlAttributes = new { @class = "hidden" } })
+            @Html.EditorFor(model => model.codCuenta, new { htmlAttributes = new { @class = "hidden" } })
+            @Html.EditorFor(model => model.codDoctoBanco, new { htmlAttributes = new { @class = "hidden" } })
+            @Html.EditorFor(model => model.codDocumento, new { htmlAttributes = new { @class = "hidden" } })
+            @Html.EditorFor(model => model.fechaBanco, new { htmlAttributes = new { @id = "datepicker", @Value = @DateTime.Now.Date.ToString("dd/MM/yyyy") } })
+
+        </div>
+    </div>
+
+
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" id="btnGuardar" value="Guardar" class="btn btn-primary" />
+        </div>
+    </div>
+</div>
+}
+
+<script src="~/Scripts/moment.js"></script>
+@section scripts {
+    <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+    <script>
+  $( function() {
+      $("#datepicker").datepicker({ dateFormat: "dd/mm/yy" }).val()
+        });
+
+        $(function () {
+            $("#datepicker").on('change', function () {
+                var fechaBanco2 = new Date($("#fechaBanco2").text());
+                var fecha = $("#datepicker").datepicker({ dateFormat: "dd/mm/yy" }).datepicker("getDate");
+                if (fecha < fechaBanco2) {
+                    $("#btnGuardar").prop("disabled", true);
+                }                
+                else {
+                    $("#btnGuardar").prop("disabled", false);
+                }
+            });
+        });
+
+
+    </script>
+
+}

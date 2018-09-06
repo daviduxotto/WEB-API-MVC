@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4A364181-A7E4-4F02-8B29-1CFC3E26FF11}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Entidades</RootNamespace>
+    <AssemblyName>Entidades</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="eArea.cs" />
+    <Compile Include="eBanco.cs" />
+    <Compile Include="eControlCalidad.cs" />
+    <Compile Include="eCuentaBanco.cs" />
+    <Compile Include="eCupon.cs" />
+    <Compile Include="eDashboard.cs" />
+    <Compile Include="eDepartamento.cs" />
+    <Compile Include="eDoctoBanco.cs" />
+    <Compile Include="eDoctoCxP.cs" />
+    <Compile Include="eEmisorTC.cs" />
+    <Compile Include="eEmpleado.cs" />
+    <Compile Include="eEmpresa.cs" />
+    <Compile Include="eEntorno.cs" />
+    <Compile Include="eEstadoDepartamento.cs" />
+    <Compile Include="eDoctoOtros.cs" />
+    <Compile Include="eFacturaCajaChica.cs" />
+    <Compile Include="eFacturaCupon.cs" />
+    <Compile Include="eInformeDBR.cs" />
+    <Compile Include="eLiquidacionCupones.cs" />
+    <Compile Include="eLiquidacionVentaDiariaxEmpresa.cs" />
+    <Compile Include="eMenu.cs" />
+    <Compile Include="eMovimientoEfectivo.cs" />
+    <Compile Include="eMovimientoPagoCC.cs" />
+    <Compile Include="eMovimientoEfectivoDet.cs" />
+    <Compile Include="eMovimientoPagoTC.cs" />
+    <Compile Include="eMovimientoTC.cs" />
+    <Compile Include="eMunicipio.cs" />
+    <Compile Include="eObservacionUV.cs" />
+    <Compile Include="ePais.cs" />
+    <Compile Include="ePantalla.cs" />
+    <Compile Include="eParSalida.cs" />
+    <Compile Include="ePresupuesto.cs" />
+    <Compile Include="eProveedor.cs" />
+    <Compile Include="ePuesto.cs" />
+    <Compile Include="eSucursal.cs" />
+    <Compile Include="eTipoBaja.cs" />
+    <Compile Include="eTipoPresupuesto.cs" />
+    <Compile Include="eToken.cs" />
+    <Compile Include="eTrasladoEmpleado.cs" />
+    <Compile Include="eUsuario.cs" />
+    <Compile Include="eVentasvsProyeccion.cs" />
+    <Compile Include="eVerificacion.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

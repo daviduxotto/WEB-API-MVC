@@ -1,0 +1,71 @@
+﻿@model  List<Entidades.eEmpleado>
+
+@{
+    ViewBag.Title = "ingresarSalarios";
+}
+
+@if (ViewBag.retorno != null)
+{
+    if (Convert.ToInt32(ViewBag.retorno) >= 1)
+    {
+    <div class="alert alert-info">@ViewBag.mensaje</div>
+    }
+    else
+    {
+    <div class="alert alert-warning">@ViewBag.mensaje</div>
+    }
+}
+<h4>Ingreso Salarios de Colaboradores</h4>
+
+@using (Html.BeginForm("guardarIngresarSalarios","empleado"))
+{
+
+<div class="form-horizontal">
+    <table id="tabla" class="table table-bordered table-hover display">
+        <thead>
+            <tr>
+
+                <th class="input-sm">COLABORADOR</th>
+                <th class="input-sm">AREA</th>
+                <th class="input-sm">DEPARTAMENTO</th>
+                <th class="input-sm">PUESTO</th>
+                <th class="input-sm">SALARIO</th>
+            
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {                
+            <tr>
+                @Html.EditorFor(model => @Model[i].codigoCorp, new { htmlAttributes = new { @class = "hidden" } })
+                <td>
+                    @(Model[i].primerNombre + " " + Model[i].segundoNombre + " " +Model[i].tercerNombre + " " + Model[i].primerApellido + " " +Model[i].segundoApellido +" "+ Model[i].apellidoCasada)
+                </td>
+                <td>
+                    @Model[i].descArea
+                </td>
+                <td>
+                    @Model[i].descDepartamento
+                </td>
+                <td>
+                    @Model[i].descPuesto
+                </td>
+                <td>
+                    @Html.EditorFor(model => @Model[i].salario, new { htmlAttributes = new { @class = "form-control input-sm pull-right celda", @style = "text-align:right" } })
+
+                </td>
+                </tr>
+                }
+        </tbody>
+    </table>
+            <div class="form-group">
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Guardar" class="btn btn-primary" />
+                    @Html.ActionLink("Salir al Menú", "index", "home", "", new { @class = "btn btn-danger" })
+                </div>
+            </div>
+</div>
+}

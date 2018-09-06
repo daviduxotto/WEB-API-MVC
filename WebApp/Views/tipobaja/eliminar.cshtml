@@ -1,0 +1,25 @@
+﻿@model Entidades.eTipoBaja
+
+
+
+@using (Html.BeginForm("guardarEliminar", "tipobaja", FormMethod.Post, new { id = "popupForm" }))
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+    <h3>Eliminar Tipo de Baja de Empleado</h3>
+    <hr />
+    @Model.codigo
+    @Html.HiddenFor(model => model.codigo)
+
+
+
+
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Guardar" class="btn btn-primary" />
+        </div>
+    </div>
+</div>
+}

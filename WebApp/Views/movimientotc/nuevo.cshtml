@@ -1,0 +1,102 @@
+﻿@model Entidades.eMovimientoTC
+
+@using (Html.BeginForm("guardarNuevo", "movimientotc", FormMethod.Post, new { id = "popupForm" }))
+{
+    <h4>Nuevo Registro</h4>
+
+    <div class="form-horizontal">
+        <hr />
+       
+        <div class="form-group">
+            <label class="control-label col-md-2" for="codEmisor">Emisor</label>
+            <div class="col-md-10">
+                @Html.DropDownListFor(m => m.codEmisor, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.codEmisor)
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2" for="codDoctoBanco">Tipo de Documento</label>
+            <div class="col-md-10">
+                @Html.DropDownListFor(m => m.codDoctoBanco, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.codDoctoBanco)
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="codDocumento">No. Documento</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.codDocumento, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(m => m.codDocumento)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="concepto">Concepto</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.concepto, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(m => m.concepto)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="monto">Monto Q.</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.monto, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(m => m.monto)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+}
+
+
+@section scripts
+{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        $(document).ready(function () {
+           
+            // ----- obtener emisores x empresa
+            $.getJSON('/emisorTC/getEmisorTCxEmpresa', null, function (data) {
+                $.each(data, function () {
+                    $('#codEmisor').append('<option value=' +
+                        this.codEmisorTC + '>' + this.descEmisorTC + '</option>');
+                });
+                // ----- obtener documentos x emisor
+                $.getJSON('/banco/getDoctoBancoTC', { codEmisor: $('#codEmisor').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#codDoctoBanco').append('<option value=' +
+                            this.codDoctoBanco + '>' + this.descDoctoBanco + '</option>');
+                    });
+                    // fin de obtener docto bancos
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener tipo de documento');
+                    });
+
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert('Error al obtener Emisores!');
+            });
+            
+            // dropdown list change emisor
+            $('#codEmisor').change(function () {
+                console.log('cambio');
+                $('#codDoctoBanco option').remove();
+                $.getJSON('/banco/getDoctoBancoTC', { codEmisor: $('#codEmisor').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#codDoctoBanco').append('<option value=' +
+                            this.codDoctoBanco + '>' + this.descDoctoBanco + '</option>');
+                    });
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener tipo de documento');
+                });
+            });
+        });
+    </script>
+}

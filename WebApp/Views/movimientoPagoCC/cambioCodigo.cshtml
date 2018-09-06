@@ -1,0 +1,145 @@
+﻿@model Entidades.eMovimientoPagoCC
+
+@using (Html.BeginForm("guardarCambioCodigo", "movimientoPagoCC", FormMethod.Post, new { id = "popupForm" }))
+{   
+      <h4>Documento No. @ViewBag.documento</h4>
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.EditorFor(model => model.codBancoAnterior, new { htmlAttributes = new { @class = "hidden" } })
+        @Html.EditorFor(model => model.codCuentaAnterior, new { htmlAttributes = new { @class = "hidden" } })
+        @Html.EditorFor(model => model.codDoctoBancoAnterior, new { htmlAttributes = new { @class = "hidden" } })
+        @Html.EditorFor(model => model.codDocumentoAnterior, new { htmlAttributes = new { @class = "hidden" } })
+        <div class="form-group">
+            <label class="control-label col-md-2" for="codBanco">Banco</label>
+            <div class="col-md-10">
+
+                @Html.DropDownListFor(m => m.codBanco, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="codCuenta">Cuenta</label>
+            <div class="col-md-10">
+                @Html.DropDownListFor(m => m.codCuenta, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control" })
+            </div>
+        </div>      
+        <div class="form-group">
+            <label class="control-label col-md-2" for="codDoctoBanco">Tipo de Documento</label>
+            <div class="col-md-10">
+                @Html.DropDownListFor(m => m.codDoctoBanco, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(m=>m.codDoctoBanco)
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="codDocumento">No. Documento</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.codDocumento, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(m => m.codDocumento)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+}
+
+
+@section scripts
+{
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#codBanco").attr('disabled', true);
+            $("#codCuenta").attr('disabled', true);
+            $("#codDoctoBanco").attr('disabled', true);
+            // Get a list of Empresas and a list of products of the first Empresa.
+            $.getJSON('/movimientoPagoCC/getBancosxEmpresa', null, function (data) {
+                $.each(data, function () {
+                    $('#codBanco').append('<option value=' +
+                      this.codBanco + '>' + this.descBanco + '</option>');
+                    var bancoAnterior = $('#codBancoAnterior').val();
+                    $('#codBanco').find('option[value=' + bancoAnterior + ']').attr('selected', 'selected');
+                });
+                $.getJSON('/movimientoPagoCC/getCuentasBancos', { codBanco: $('#codBanco').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#codCuenta').append('<option value=' +
+                          this.codCuentaBanco + '>' + this.descCuentaBanco + '</option>');
+                        var cuentaAnterior = $('#codCuentaAnterior').val();
+                        $('#codCuenta').find('option[value=' + cuentaAnterior + ']').attr('selected', 'selected');
+                    });
+                    $.getJSON('/movimientoPagoCC/getdoctobanco', { codCuenta: $('#codCuenta').val(), codBanco: $('#codBanco').val() }, function (data) {
+                        $.each(data, function () {
+                            $('#codDoctoBanco').append('<option value=' +
+                              this.codDoctoBanco + '>' + this.descDoctoBanco + '</option>');
+                            var doctoBancoAnterior = $('#codDoctoBancoAnterior').val();
+                            $('#codDoctoBanco').find('option[value=' + doctoBancoAnterior + ']').attr('selected', 'selected');
+                        });
+                        // fin de obtener docto bancos
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error al obtener tipo de documento');
+                    });
+                    // fin de obtener cuentas bancos
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener  cuentas bancarias');
+                });
+
+
+
+            // fin de obtener bancos
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert('Error al obtener bancos!');
+            });
+            // Dropdown list change banco
+            $('#codBanco').change(function () {
+                $('#codCuenta option').remove();
+                $.getJSON('/movimientoPagoCC/getCuentasBancos', { codBanco: $('#codBanco').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#codCuenta').append('<option value=' +
+                          this.codCuentaBanco + '>' + this.descCuentaBanco + '</option>');
+                        var cuentaAnterior = $('#codCuentaAnterior').val();
+                        $('#codCuenta').find('option[value=' + cuentaAnterior + ']').attr('selected', 'selected');
+                    });
+                    console.log('cambio al actualzar banco');
+                    $('#codDoctoBanco option').remove();
+                    $.getJSON('/movimientoPagoCC/getdoctobanco', { codCuenta: $('#codCuenta').val(), codBanco: $('#codBanco').val() }, function (data) {
+                        $.each(data, function () {
+                            $('#codDoctoBanco').append('<option value=' +
+                              this.codDoctoBanco + '>' + this.descDoctoBanco + '</option>');
+                            var doctoBancoAnterior = $('#codDoctoBancoAnterior').val();
+                            $('#codDoctoBanco').find('option[value=' + doctoBancoAnterior + ']').attr('selected', 'selected');
+                        });
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error al obtener tipo de documento');
+                    });
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener sucursales');
+                });
+
+
+            });
+            // dropdown list change cuenta
+            $('#codCuenta').change(function () {
+                $('#codDoctoBanco option').remove();
+                $.getJSON('/movimientoPagoCC/getdoctobanco', { codCuenta: $('#codCuenta').val(), codBanco: $('#codBanco').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#codDoctoBanco').append('<option value=' +
+                          this.codDoctoBanco + '>' + this.descDoctoBanco + '</option>');
+                           var doctoBancoAnterior = $('#codDoctoBancoAnterior').val();
+                          $('#codDoctoBanco').find('option[value=' + doctoBancoAnterior + ']').attr('selected', 'selected');
+                    });
+                   
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener tipo de documento');
+                });
+            });
+            
+        });
+    </script>
+}

@@ -1,0 +1,502 @@
+﻿@model List<Entidades.eMovimientoPagoCC>
+@{
+    ViewBag.Title = "Clientes Crédito en Efectivo";
+}
+
+<h3>Pagos de Clientes Crédito en Efectivo</h3>
+<input type="button" value="Iniciar Validación" class="col-md-3 btn btn-primary" id="btnAbrir" />
+<br />
+<br />
+
+<table class="table table-bordered bg-info">
+    <tbody>
+        <tr>
+            <th class="input-sm" scope="row">Empresa: @ViewBag.empresa</th>
+            <th class="input-sm" scope="row">Sucursal: @ViewBag.estacion</th>
+            <th class="input-sm" scope="row">Fecha: @Convert.ToDateTime(@ViewBag.dia).ToShortDateString()</th>
+
+        </tr>
+    </tbody>
+</table>
+<img src="~/images/wait.gif"  id="loading-indicator" style="display:none"/>
+<div class="contenedor">
+    <div class="tablecontainer">
+        <input type="button" value="Expandir Todos" class="col-md-2 btn btn-info" id="btn-show-all-children" />
+        <input type="button" value="Contraer Todos" class="col-md-2 btn btn-info" id="btn-hide-all-children" />
+        <table id="tablaMovimiento" class="table table-striped  table">
+
+            <thead class="bg-info">
+                <tr>
+                    <th></th>
+                    <th class="">COD.</th>
+                    <th>BANCO</th>
+                    <th>COD</th>
+                    <th>CUENTA</th>
+                    <th class="hidden"></th>
+                    <th>T. DOCUMENTO</th>
+                    <th>No. DOCUMENTO</th>
+                    <th Class="hidden"></th>
+                    <th>CLIENTE</th>
+                    <th>MONTO</th>
+                    <th>CONCI.</th>
+                    <th class="hidden">REVER.</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+
+        <div id="divResultado">
+
+        </div>
+        <div id="botonera">
+            <input type="button" value="Finalizar Validación" class="col-md-3 btn btn-danger" id="btnFinalizar" />
+            <br />
+        </div>
+        <hr />
+        <h3>Observaciones</h3>
+        @Html.ActionLink("Agregar Observación", "nuevaObservacion", "observacionUV", new { pantalla = "05" }, new { @class = "popup btn btn-primary" })
+        @Html.ActionLink("Informe de observaciones", "verInformeObservacionPantalla", "observacionUV", new { pantalla = "05" }, new { @class = "btn btn-primary" })
+        <br />
+    </div>
+</div>
+<div id="divObservacion" class="tablecontainer">
+
+</div>
+<hr />
+<div>
+    @Html.ActionLink("Salir", "index", "home", "", new { @class = "btn btn-danger" })
+    @Html.ActionLink("Retroceder", "vercupones", "cupon", "", new { @class = "btn btn-primary" })
+    @Html.Partial("btnUV")
+    @Html.ActionLink("Avanzar", "edit", "movimientopagotc", "", new { @class = "btn btn-primary" })
+
+</div>
+<style>
+    .left {
+        text-align: left;
+    }
+
+    .right {
+        text-align: right;
+    }
+
+    .center {
+        text-align: center;
+    }
+
+    .disabled {
+        color: grey;
+    }
+
+    td.details-control {
+        background: url('../../images/details_open.png') no-repeat center center;
+        cursor: pointer;
+    }
+
+    tr.shown td.details-control {
+        background: url('../../images/details_close.png') no-repeat center center;
+    }
+
+    #Detalle th {
+        background-color: #ECF0F1;
+        -webkit-border-radius: 1px 1px 2px 2px;
+        border-radius: 1px 1px 2px 2px;
+        border-bottom: 2px solid #B3B3B3;
+    }
+
+    #Detalle tfoot {
+        background-color: #ECF0F1;
+        -webkit-border-radius: 1px 1px 2px 2px;
+        border-radius: 1px 1px 2px 2px;
+        border-top: 2px solid #B3B3B3;
+        font-weight: bold;
+    }
+    #loading-indicator {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+    }
+    
+</style>
+
+
+
+
+
+
+
+@section scripts
+{
+    <script src="~/Scripts/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <link href="~/Scripts/DataTables/datatables.min.css" rel="stylesheet" />
+    <script src="~/Scripts/moment.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+
+            cargarTotales();
+            cargarObservaciones();
+            obtenerEstado();
+            var oTable = $('#tablaMovimiento').DataTable(
+                {
+                    "searching": false,
+                    "paging": false,
+                    language: {
+                        decimal: ",",
+                        processing: "Procesando...",
+                        search: "Buscar:",
+                        lengthMenu: "",
+                        info: "",
+                        infoEmpty: "",
+                        infoFiltered: "",
+                        infoPostFix: "",
+                        loadingRecords: "",
+                        zeroRecords: "",
+                        emptyTable: "",
+                        paginate: {
+                            first: "Primero",
+                            previous: "Anterior",
+                            next: "Siguiente",
+                            last: "Ultimo"
+                        },
+                        aria: {
+                            sortAscending: ": activer pour trier la colonne par ordre croissant",
+                            sortDescending: ": activer pour trier la colonne par ordre décroissant"
+                        }
+                    },
+                    "ajax": {
+                        "url": '/movimientopagocc/getmovimientopagocc',
+                        "type": "get",
+                        "datatype": "json"
+                    },
+                    "columns": [
+                        {
+                            "className": 'details-control',
+                            "orderable": false,
+                            "data": null,
+                            "defaultContent": '',
+                            "render": function () {
+                                return '<a class="fa fa-plus-square" data-toggle="tooltip" data-placement="top" title="Detalles"></a>';
+                            },
+                            width: "15px"
+                        },
+                        { "data": "codBanco", width: 5 },
+                        { "data": "descBanco", width: 200 },
+                        { "data": "codCuenta", width: 400 },
+                        { "data": "descCuenta", width: 400 },
+                        { "data": "codDoctoBanco", "autoWidth": true, "class": "hidden" },
+                        { "data": "descDoctoBanco", "autoWidth": true },
+                        { "data": "codDocumento", "autoWidth": true },
+                        { "data": "codCliente", "autoWidth": true, "class": "hidden" },
+                        { "data": "descCliente", "autoWidth": true },
+                        { "data": "monto", "autoWidth": true, "className": "right", "type": "numeric-comma", targets: 3 },
+                        {
+                            "data": "conciliado", "width": "10", "render": function (data, type, full) {
+                                if (data == true) {
+                                    return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Desconciliación"  href="/movimientopagocc/conciliar/1?banco=' + full.codBanco + '&cuenta=' + full.codCuenta + '&doctobanco=' + full.codDoctoBanco + '&documento=' + full.codDocumento.replace(' ', '*') + '"> <span class="glyphicon glyphicon-record"></span></a>';
+                                }
+                                else {
+                                    return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Conciliar"  href="/movimientopagocc/conciliar/1?banco=' + full.codBanco + '&cuenta=' + full.codCuenta + '&doctobanco=' + full.codDoctoBanco + '&documento=' + full.codDocumento.replace(' ', '*') + '"> <span class="glyphicon glyphicon-unchecked"></span></a>';
+                                }
+
+                            }, className: "center"
+                        },
+                        {
+                            "data": "Revertir", "width": "10", "render": function (data, type, full) {
+                                if (data == true) {
+                                    return '<a  data-toggle="tooltip" data-placement="top" title="Revertido"  href="#"> <span class="glyphicon glyphicon-record"></span></a>';
+                                }
+                                else {
+                                    return '<a class="popup hidden" data-toggle="tooltip" data-placement="top" title="Revertir"  href="#"> <span class="glyphicon glyphicon-unchecked"></span></a>';
+                                }
+
+                            }, className: "center"
+                        },
+                        {
+                            "data": "descBanco", "width": "10", "render": function (data, type, full) {
+                                return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Cambiar el Codigo del Documento"  href="/movimientopagocc/cambiocodigo/1?banco=' + full.codBanco + '&cuenta=' + full.codCuenta + '&doctobanco=' + full.codDoctoBanco + '&documento=' + full.codDocumento.replace(' ', '*') + '"> <span class="glyphicon glyphicon-list-alt"></span></a>';
+                            }
+                        }
+                    ], "initComplete": function (settings, json) {
+                        obtenerEstado();
+                    }
+                });
+            // Add event listener for opening and closing details
+            $('#tablaMovimiento tbody').on('click', 'td.details-control', function () {
+                var tr = $(this).closest('tr');
+                var row = oTable.row(tr);                
+                if (row.child.isShown()) {
+                    // This row is already open - close it
+                    row.child.hide();
+                    tr.removeClass('shown');
+                } else {
+                    // Open this row
+                    row.child(format(row.data())).show();
+                    tr.addClass('shown');
+                }
+            });
+
+            // Expandir todos los depósitos
+            $('#btn-show-all-children').on('click', function () {
+                // Enumerate all rows
+                oTable.rows().every(function () {
+                    // si todo lo está colapsado
+                    if (!this.child.isShown()) {
+                        // Muestra las filas
+                        this.child(format(this.data())).show();
+                        $(this.node()).addClass('shown');
+                    }
+                });
+            });
+
+
+            // Contraer todos los depósitos
+            $('#btn-hide-all-children').on('click', function () {
+                // Enumerate all rows
+                oTable.rows().every(function () {
+                    // si todo lo está expandido
+                    if (this.child.isShown()) {
+                        // Muestra las filas
+                        this.child.hide();
+                        $(this.node()).removeClass('shown');
+                    }
+                });
+            });
+
+            
+
+            // -- Eventos Clicks
+            // -- Boton con Vista Parcial
+            $('.tablecontainer').on('click', 'a.popup', function (e) {
+                e.preventDefault();
+                OpenPopup($(this).attr('href'));
+            })
+            // -- Boton sin Vista
+            $('.tablecontainer').on('click', 'a.popup1', function (e) {
+                e.preventDefault();
+                var url = $(this).attr('href')
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    success: function (data) {
+                        if (data.status) {
+
+                            oTable.ajax.reload();
+                            cargarTotales();
+                        }
+                        obtenerEstado();
+                    }
+                })
+            })
+
+            // --Popup
+            function OpenPopup(pageUrl) {
+                var $pageContent = $('<div/>');
+                $pageContent.load(pageUrl, function () {
+                });
+                // -- Abrir Dialogo
+                $dialog = $('<div class="popupWindow" style="overflow:auto"></div>')
+                    .html($pageContent)
+                    .dialog(
+                    {
+                        draggable: true,
+                        autoOpen: false,
+                        resizable: false,
+                        model: true,
+                        title: '',
+                        height: 'auto',
+                        width: 600,
+                        close: function () {
+                            $dialog.dialog('destroy').remove();
+                        }
+                    })
+                // -- Enviar Formulario
+                $('.popupWindow').on('submit', '#popupForm', function (e) {
+                    var url = $('#popupForm')[0].action;
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: $('#popupForm').serialize(),
+                        success: function (data) {
+                            if (data.salida.retorno >= 1) {
+                                $dialog.dialog('close');
+                                oTable.ajax.reload();
+                                cargarTotales();
+                                cargarObservaciones();
+                                $.notify(data.salida.mensaje, "info");
+                            } else {
+                                $.notify(data.salida.mensaje, "warn");
+                            }
+
+                            obtenerEstado();
+                        }
+                    })
+                    e.preventDefault();
+                })
+                $dialog.dialog('open');
+            }
+
+            function cargarTotales() {
+                $.ajax({
+                    type: "POST",
+                    url: '/movimientopagocc/getLiquidacionPagoClienteXempresa',
+                    success: function (data) {
+                        $('#divResultado').empty();
+
+                        $('#divResultado').append(
+                            '<table class="table table-bordered">'
+                            +
+                            '<tr><th>Total Reportado</th><th>Total Conciliado</th><th>Diferencia</th></tr>' +
+                            '<tr><th>Q. ' + data.montoTotalReportado + '</th><th>Q. ' + data.montoTotalConciliado + '</th><th>Q. ' + data.diferenciaMontoConciliado + '</th></tr>'
+                            +
+                            '</table>'
+                        );
+                    }
+                })
+            }
+
+            function cargarObservaciones() {
+                $.ajax({
+                    type: "POST",
+                    url: '/observacionUV/getObservacionUV/id=1?codPantalla=05',
+                    success: function (data) {
+                        $('#divObservacion').empty();
+                        $('#divObservacion').append('<table class="table table-bordered" id="tblObservacion">'
+                            +
+                            '<tr><th class="hidden">Codigo</th><th width=700>Descripción</th><th>Usuario</th><th class="hidden">Tipo</th><th>Fecha</th><th>Acción</th></tr>'
+                        );
+                        $.each(data, function () {
+                            if (this.tipoObservacion == "M") {
+                                $('#tblObservacion').append(
+                                    '<tr><td class="hidden">' + this.codObservacion + '</td><td width=700>' + this.descripcion + '</td><td>' + this.usuario + '</td><td class="hidden">' + this.tipoObservacion + '</td><td>' + this.fecha + '</td><td><a class="popup" data-toggle="tooltip" data-placement="top" title="Eliminar Observación"  href="/observacionUV/eliminar/1?codObservacion=' + this.codObservacion + '"> <span class="glyphicon glyphicon-trash"></span></a></td></tr>'
+                                );
+                            } else {
+                                $('#tblObservacion').append(
+                                    '<tr><td class="hidden">' + this.codObservacion + '</td><td width=700>' + this.descripcion + '</td><td>' + this.usuario + '</td><td class="hidden">' + this.tipoObservacion + '</td><td>' + this.fecha + '</td></tr>'
+                                );
+                            }
+
+                        });
+                        $('#divObservacion').append('</table>');
+                    }
+                })
+            }
+
+            $(function () {
+                $("#datepicker").datepicker({ dateFormat: "dd/mm/yy" }).val()
+            });
+            function obtenerEstado() {
+                $.ajax({
+                    type: "POST",
+                    url: '/movimientopagocc/getEstadoPantalla',
+                    success: function (data) {
+                        if (data.salida.retorno >= 1) {
+                            $(".contenedor").find('input, textarea, button, span, td, a').removeClass('disabled');
+                            $('.glyphicon').fadeIn(2000);
+                            $('#botonera').fadeIn(2000);
+                        }
+                        else {
+                            $(".contenedor").find('input, textarea, button, span, td, a').addClass('disabled');
+                            $('.glyphicon').slideUp();
+                            $('#botonera').slideUp();
+                        }
+                        cargarObservaciones();
+                    }
+                });
+            }
+            function abrirVentana() {
+                $.ajax({
+                    type: "POST",
+                    url: '/movimientopagocc/abrirPantallaUV',
+                    success: function (data) {
+                        if (data.salida.retorno >= 1) {
+                            obtenerEstado();
+                        }
+                        else {
+                            $.notify(data.salida.mensaje, "warn");
+                        }
+                    }
+                })
+            }
+            function cerrarVentana() {
+                $.ajax({
+                    type: "POST",
+                    url: '/movimientopagocc/cerrarPantallaUV',
+                    success: function (data) {
+                        if (data.salida.retorno >= 1) {
+                            $.notify(data.salida.mensaje, "info");
+                            obtenerEstado();
+                        }
+                        else {
+                            $.notify(data.salida.mensaje, "warn");
+                            obtenerEstado();
+                        }
+                    }
+                });
+            }
+            $("#btnAbrir").on('click', function () {
+                abrirVentana();
+            });
+
+            $("#btnFinalizar").on('click', function () {
+                cerrarVentana();
+            });
+
+        }); //Fin funcion document ready
+        /* Formatting function for row details - modify as you need */
+        function format(d) {
+            var resultado;
+            var temporal = "";
+            var datoFecha;
+            var fecha;
+            var sumaVales=0.00;
+            
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: { Banco: d.codBanco, cuenta: d.codCuenta, doctobanco: d.codDoctoBanco, documento: d.codDocumento },
+                url: "/movimientopagocc/getMovPagoCCXFechaDetalle",
+                success: function (data) {
+                    resultado = '<table id="Detalle" cellspacing="0" border="0" style="padding-left:50px;">' +
+                        '<tr><th></th><th>Documento</th><th>No. Factura </th><th>Fecha </th><th>Serie </th><th>Monto Total</th><th>Monto Pagado</th><th>Monto Pendiente</th></tr>';
+                    $.each(data, function () {
+                        if (this.noFactura != temporal) {
+                            datoFecha = this.fechaFactura;
+                            fecha = moment(datoFecha, "DD-MM-YYYY");
+                            datoFecha = new Date(fecha);
+                            fecha = datoFecha.toLocaleDateString();
+                            resultado += '<tr><td class="bg-success"></td><td class="bg-success">' + this.codDoctoPosFactu + '</td><td class="bg-success">' + this.noFactura + '</td><td class="bg-success">' + fecha + '</td><td class="bg-success">' + this.noSerie + '</td><td class="bg-success">' + 'Q.  ' + this.montoFactura.toFixed(2) + '</td><td class="bg-success">' + 'Q.  ' + this.montoPagadoFactura.toFixed(2) + '</td><td class="bg-success">' + 'Q.  ' + this.saldoPendienteFactura.toFixed(2) + '</td></tr>';
+                            temporal = this.noFactura;
+                        }
+                        if (this.codDoctoPosVale != "") {
+                            datoFecha = this.fechaVale;
+                            fecha = moment(datoFecha, "DD-MM-YYYY");
+                            datoFecha = new Date(fecha);
+                            fecha = datoFecha.toLocaleDateString();
+                            sumaVales += this.montoVale;
+                            resultado += '<tr><td></td><td></td><td>' + this.codDoctoPosVale + '</td><td>' + fecha + '</td><td>' + this.noVale + '</td><td  align="right">' + 'Q.  ' + this.montoVale.toFixed(2) + '</td></tr>';
+                        }                        
+                    });
+                    resultado += '<tfoot><tr align="right"><td colspan="5">TOTAL DE VALES</td><td>' + 'Q.  ' + + sumaVales.toFixed(2) + '</td></tr></tfoot>';
+                    resultado += '</table>';
+                }
+            });
+            return resultado;
+        }
+
+        function formatoFecha(valor) {
+            var datoFecha;
+            var fecha;
+                datoFecha = this.fechaVale;
+                fecha = moment(datoFecha, "DD-MM-YYYY");
+                datoFecha = new Date(fecha);
+                fecha = datoFecha.toLocaleDateString();
+                return fecha;
+
+        }
+    </script>
+}

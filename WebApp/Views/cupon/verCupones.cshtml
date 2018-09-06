@@ -1,0 +1,528 @@
+﻿
+@{
+    ViewBag.Title = "Cupones";
+}
+
+<h3>Validación de Cupones</h3>
+<input type="button" value="Iniciar Validación" class="col-md-3 btn btn-primary" id="btnAbrir" />
+<br />
+<br />
+<table class="table table-bordered bg-info">
+    <tbody>
+        <tr>
+            <th class="input-sm" scope="row">Empresa: @ViewBag.empresa</th>
+            <th class="input-sm" scope="row">Sucursal: @ViewBag.estacion</th>
+            <th class="input-sm" scope="row">Fecha: @Convert.ToDateTime(@ViewBag.dia).ToShortDateString()</th>
+
+        </tr>
+    </tbody>
+</table>
+<div class="contenedor">
+    <div class="table table-striped tablecontainer">
+        @Html.ActionLink("Agregar Cupon", "nuevoCupon", "cupon", "", new { @class = "popup btn btn-primary" })
+        <table id="tablaCupones">
+            <thead>
+                <tr>
+                    <th class="hidden">COD_EMPRESA</th>
+                    <th class="hidden">DESC_EMPRESA</th>
+                    <th class="hidden">COD_ESTACION</th>
+                    <th class="hidden">DESC_ESTACION</th>
+                    <th class="hidden">DIA</th>
+                    <th>COD</th>
+                    <th>EMISOR</th>
+                    <th class="hidden">COD_DENOMINACION</th>
+                    <th>DENOMINACION</th>
+                    <th>NUMERO</th>
+                    <th>VALOR</th>
+                  
+                    <th>VALIDADO</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div id="divResultadoCupones">
+
+    </div>
+    <hr />
+    <h3>Facturas de Cupones</h3>
+    <div class="table table-striped tablecontainer">
+        <table id="tablaFacturas">
+            <thead>
+                <tr>
+                    <th class="hidden">COD_EMPRESA</th>
+                    <th class="hidden">DESC_EMPRESA</th>
+                    <th class="hidden">COD_ESTACION</th>
+                    <th class="hidden">DESC_ESTACION</th>
+                    <th class="hidden">COD_DOCTO_POS</th>
+                    <th>TIPO DOCTO</th>
+                    <th>NO SERIE</th>
+                    <th>NO FACTURA</th>
+                    <th>COD CLIENTE</th>
+                    <th>CLIENTE</th>
+                    <th class="hidden">FECHA</th>
+                    <th class="hidden">COD_EMISOR</th>
+                    <th class="hidden">EMISOR</th>
+                    <th>APLICA DESC.</th>
+                    <th>% DESCUENTO</th>
+                    <th>MONTO DESC.</th>
+                    <th>TOTAL</th>
+                    <th>VALIDADO</th>
+                </tr>
+            </thead>
+        </table>
+        <div id="divResultadoFacturas">
+
+        </div>
+        <div id="botonera">
+            <input type="button" value="Finalizar Validación" class="col-md-3 btn btn-danger" id="btnFinalizar" />
+            <br />
+        </div>
+        <hr />
+        <h3>Observaciones</h3>
+        @Html.ActionLink("Agregar Observación", "nuevaObservacion", "observacionUV", new { pantalla = "04" }, new { @class = "popup btn btn-primary" })
+        @Html.ActionLink("Informe de observaciones", "verInformeObservacionPantalla", "observacionUV", new { pantalla = "04" }, new { @class = "btn btn-primary" })
+        <br />
+    </div>
+    <div id="divObservacion" class="tablecontainer">
+
+    </div>
+</div>
+
+
+<hr />
+
+<div>
+    @Html.ActionLink("Salir", "index", "home", "", new { @class = "btn btn-danger" })
+    @Html.ActionLink("Retroceder", "edit", "movimientotc", "", new { @class = "btn btn-primary" })
+    @Html.Partial("btnUV")
+    @Html.ActionLink("Avanzar", "edit", "movimientopagocc", "", new { @class = "btn btn-primary" })
+</div>
+<style>
+    .disabled {
+        color: grey;
+    }
+</style>
+@section scripts
+{
+    <script src="~/Scripts/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script async type="text/javascript">
+        $(document).ready(function () {
+            cargarTotales();
+            cargarObservaciones();
+            $('[data-toggle="tooltip"]').tooltip()
+            
+            // tabla de cupones ------------------------------
+            var tablaCupones = $('#tablaCupones').DataTable(
+                {
+                    "searching": false,
+                    "paging": false,
+                    language: {
+                        decimal: ",",
+                        processing: "Procesando...",
+                        search: "Buscar:",
+                        lengthMenu: "",
+                        info: "",
+                        infoEmpty: "",
+                        infoFiltered: "",
+                        infoPostFix: "",
+                        loadingRecords: "",
+                        zeroRecords: "",
+                        emptyTable: "",
+                        paginate: {
+                            first: "Primero",
+                            previous: "Anterior",
+                            next: "Siguiente",
+                            last: "Ultimo"
+                        },
+                        aria: {
+                            sortAscending: ": activer pour trier la colonne par ordre croissant",
+                            sortDescending: ": activer pour trier la colonne par ordre décroissant"
+                        }
+                    },
+                    "ajax": {
+                        "url": '/cupon/getcuponesxestacionxfecha',
+                        "type": "get",
+                        "datatype": "json"
+                    },
+                    "columns": [
+                        { "data": "codEmpresa", "autoWidth": true, "class": "hidden" },
+                        { "data": "descEmpresa", "autoWidth": true, "class": "hidden" },
+                        { "data": "codSucursal", "autoWidth": true, "class": "hidden" },
+                        { "data": "descSucursal", "autoWidth": true, "class": "hidden" },
+                        { "data": "dia", "autoWidth": true, "class": "hidden" },
+                        { "data": "codEmisor", width: 200 },
+                        { "data": "descEmisor", width: 400 },
+                        { "data": "codDenominacion", "autoWidth": true, "class": "hidden" },
+                        { "data": "descDenominacion", width: 400 },
+                        { "data": "numero", "autoWidth": true, "className": "right", "type": "numeric-comma", targets: 3 },
+                        { "data": "valorQuetzales", "autoWidth": true, "className": "right", "type": "numeric-comma", targets: 3 },
+
+                        {
+                            "data": "validado", "width": "10", "render": function (data, type, full) {
+                                if (data == true) {
+                                    return '<a class="popup1" data-toggle="tooltip" data-placement="top" title="Desvalidar" onKeyDown="tab_btn(event);" href="/cupon/validarcupon/1?emisor=' + full.codEmisor + '&denominacion=' + full.codDenominacion + '&numero=' + full.numero + '"> <span class="glyphicon glyphicon-record"></span></a>';
+                                }
+                                else {
+                                    return '<a class="popup1" data-toggle="tooltip" data-placement="top" title="Validar"  href="/cupon/validarcupon/1?emisor=' + full.codEmisor + '&denominacion=' + full.codDenominacion + '&numero=' + full.numero + '"> <span class="glyphicon glyphicon-unchecked"></span></a>';
+                                }
+
+                            }, className: "center"
+                        },
+                        {
+                            "data": "validado", "width": "10", "render": function (data, type, full) {
+                                return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Editar"  href="/cupon/editarcupon/1?emisor=' + full.codEmisor + '&denominacion=' + full.codDenominacion + '&numero=' + full.numero + '"> <span class="glyphicon glyphicon-pencil"></span></a>';
+
+                            }, className: "center"
+                        },
+                        {
+                            "data": "validado", "width": "10", "render": function (data, type, full) {
+                                return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Eliminar"  href="/cupon/eliminarcupon/1?emisor=' + full.codEmisor + '&denominacion=' + full.codDenominacion + '&numero=' + full.numero + '" > <span class="glyphicon glyphicon-trash"></span></a>';
+
+                            }, className: "center"
+                        }
+                    ], "initComplete": function (settings, json) {
+                        obtenerEstado();
+                    }
+                });
+
+            // tabla de factua de cupones -------------
+            var tablaFacturas = $('#tablaFacturas').DataTable(
+                {
+                    "searching": false,
+                    "paging": false,
+                    language: {
+                        decimal: ",",
+                        processing: "Procesando...",
+                        search: "Buscar:",
+                        lengthMenu: "",
+                        info: "",
+                        infoEmpty: "",
+                        infoFiltered: "",
+                        infoPostFix: "",
+                        loadingRecords: "",
+                        zeroRecords: "",
+                        emptyTable: "",
+                        paginate: {
+                            first: "Primero",
+                            previous: "Anterior",
+                            next: "Siguiente",
+                            last: "Ultimo"
+                        },
+                        aria: {
+                            sortAscending: ": activer pour trier la colonne par ordre croissant",
+                            sortDescending: ": activer pour trier la colonne par ordre décroissant"
+                        }
+                    },
+                    "ajax": {
+                        "url": '/facturacupon/getFacturaCuponesxEstacionxFecha',
+                        "type": "get",
+                        "datatype": "json"
+                    },
+                    "columns": [
+                        { "data": "codEmpresa", "autoWidth": true, "class": "hidden" },
+                        { "data": "descEmpresa", "autoWidth": true, "class": "hidden" },
+                        { "data": "codSucursal", "autoWidth": true, "class": "hidden" },
+                        { "data": "descSucursal", "autoWidth": true, "class": "hidden" },
+                        { "data": "codDoctoPos", "autoWidth": true, "class": "hidden" },
+                        { "data": "descTipoDocto", width: 200 },
+                        { "data": "noSerie", width: 200 },
+                        { "data": "noFactura", width: 400 },
+                        { "data": "codCliente", width: 200 },
+                        { "data": "descCliente", width: 400 },
+                        { "data": "fecha", "autoWidth": true, "class": "hidden" },
+
+                        { "data": "codEmisor", "autoWidth": true, "class": "hidden" },
+                        { "data": "descEmisor", "autoWidth": true, "class": "hidden" },
+
+                        {
+                            "data": "aplicaDescuento", "width": "10", "render": function (data, type, full) {
+                                if (data == true) {
+                                    return ' <span class="glyphicon glyphicon-record"></span>';
+                                }
+                                else {
+                                    return ' <span class="glyphicon glyphicon-unchecked"></span>';
+                                }
+
+                            }, className: "center"
+                        },
+                        { "data": "porcentajeDescuento", "autoWidth": true, "className": "right", "type": "numeric-comma", targets: 3 },
+                        { "data": "montoDescuento", "autoWidth": true, "className": "right", "type": "numeric-comma", targets: 3 },
+                        { "data": "montoTotal", "autoWidth": true, "className": "right", "type": "numeric-comma", targets: 3 },
+                        {
+                            "data": "validado", "width": "10", "render": function (data, type, full) {
+                                if (data == true) {
+                                    return '<a class="popup1" data-toggle="tooltip" data-placement="top" title="Desvalidar"  href="/facturacupon/validarfacturacupon/1?docto=' + full.codDoctoPos + '&serie=' + full.noSerie + '&factura=' + full.noFactura + '"> <span class="glyphicon glyphicon-record"></span></a>';
+                                }
+                                else {
+                                    return '<a class="popup1" data-toggle="tooltip" data-placement="top" title="Validar"  href="/facturacupon/validarfacturacupon/1?docto=' + full.codDoctoPos + '&serie=' + full.noSerie + '&factura=' + full.noFactura + '">  <span class="glyphicon glyphicon-unchecked"></span></a>';
+                                }
+
+                            }, className: "center"
+                        },
+                    ], "initComplete": function (settings, json) {
+                        obtenerEstado();
+                    }
+                });
+            
+
+            // -- Boton sin Vista
+            $('.tablecontainer').on('click', 'a.popup1', function (e) {
+                e.preventDefault();
+                var url = $(this).attr('href')
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    success: function (salida) {
+                        if (salida.retorno >= 1) {
+                            tablaCupones.ajax.reload();
+                            tablaFacturas.ajax.reload();
+                            cargarTotales();
+                        }
+                        $.notify(salida.mensaje, "info");
+                        obtenerEstado();
+                    }
+                })
+            })
+            // -- Boton con Vista Parcial
+            $('.tablecontainer').on('click', 'a.popup', function (e) {
+                e.preventDefault();
+                OpenPopup($(this).attr('href'));
+                obtenerEstado();
+            })
+
+            // --Popup
+            function OpenPopup(pageUrl) {
+                var $pageContent = $('<div/>');
+                $pageContent.load(pageUrl, function () {
+                });
+                // -- Abrir Dialogo
+                $dialog = $('<div class="popupWindow" style="overflow:auto"></div>')
+                    .html($pageContent)
+                    .dialog(
+                    {
+                        draggable: true,
+                        autoOpen: false,
+                        resizable: false,
+                        model: true,
+                        title: '',
+                        height: 'auto',
+                        width: 600,
+                        close: function () {
+                            $dialog.dialog('destroy').remove();
+                        }
+                    })
+                // -- Enviar Formulario
+                $('.popupWindow').on('submit', '#popupForm', function (e) {
+                    var url = $('#popupForm')[0].action;
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: $('#popupForm').serialize(),
+                        success: function (data) {
+                            if (data.salida.retorno >= 1) {
+                                $dialog.dialog('close');
+                                tablaCupones.ajax.reload();
+                                tablaCupones.ajax.reload();
+                                cargarTotales();
+                                cargarObservaciones();
+                                $.notify(data.salida.mensaje, "info");
+                            } else {
+                                $.notify(data.salida.mensaje, "warn");
+                            }
+                            obtenerEstado();
+                        }
+                    })
+                    e.preventDefault();
+                })
+                $dialog.dialog('open');
+            }
+
+            function cargarTotales() {
+                $.ajax({
+                    type: "POST",
+                    url: '/cupon/getLiquidacionCupones',
+                    success: function (data) {
+                        $('#divResultadoCupones').empty();
+                        $('#divResultadoCupones').append('<table class="table table-bordered">'
+                            +
+                            '<tr><th>Total Reportado</th><th>Total Documentos</th><th>Diferencia</th></tr>' +
+                            '<tr><th> Q. ' + data.montoTotalReportado + '</th><th>Q. ' + data.montoTotalDocumentos + '</th><th> Q. ' + data.diferenciaMontoDocto + '</th></tr>'
+                            +
+                            '</table>'
+                        );
+                        $('#divResultadoCupones').append(
+                            '<table class="table table-bordered">'
+                            +
+                            '<tr><th>Total Reportado</th><th>Total Conciliado</th><th>Diferencia</th></tr>' +
+                            '<tr><th>Q. ' + data.montoTotalReportado + '</th><th>Q. ' + data.montoTotalConciliado + '</th><th>Q. ' + data.diferenciaMontoConciliado + '</th></tr>'
+                            +
+                            '</table>'
+                        );
+                    }
+                });
+                $.ajax({
+                    type: "POST",
+                    url: '/facturacupon/getLiquidacionFacturaCupones',
+                    success: function (data) {
+                        $('#divResultadoFacturas').empty();
+                        $('#divResultadoFacturas').append('<table class="table table-bordered">'
+                            +
+                            '<tr><th>Total Reportado</th><th>Total Documentos</th><th>Diferencia</th></tr>' +
+                            '<tr><th> Q. ' + data.montoTotalReportado + '</th><th>Q. ' + data.montoTotalDocumentos + '</th><th> Q. ' + data.diferenciaMontoDocto + '</th></tr>'
+                            +
+                            '</table>'
+                        );
+                        $('#divResultadoFacturas').append(
+                            '<table class="table table-bordered">'
+                            +
+                            '<tr><th>Total Reportado</th><th>Total Conciliado</th><th>Diferencia</th></tr>' +
+                            '<tr><th>Q. ' + data.montoTotalReportado + '</th><th>Q. ' + data.montoTotalConciliado + '</th><th>Q. ' + data.diferenciaMontoConciliado + '</th></tr>'
+                            +
+                            '</table>'
+                        );
+                    }
+                })
+            }
+            function cargarObservaciones() {
+                $.ajax({
+                    type: "POST",
+                    url: '/observacionUV/getObservacionUV/id=1?codPantalla=04',
+                    success: function (data) {
+                        $('#divObservacion').empty();
+                        $('#divObservacion').append('<table class="table table-bordered" id="tblObservacion">'
+                            +
+                            '<tr><th class="hidden">Codigo</th><th width=700>Descripción</th><th>Usuario</th><th class="hidden">Tipo</th><th>Fecha</th><th>Acción</th></tr>'
+                        );
+                        $.each(data, function () {
+                            if (this.tipoObservacion == "M") {
+                                $('#tblObservacion').append(
+                                    '<tr><td class="hidden">' + this.codObservacion + '</td><td width=700>' + this.descripcion + '</td><td>' + this.usuario + '</td><td class="hidden">' + this.tipoObservacion + '</td><td>' + this.fecha + '</td><td><a class="popup" data-toggle="tooltip" data-placement="top" title="Eliminar Observación"  href="/observacionUV/eliminar/1?codObservacion=' + this.codObservacion + '"> <span class="glyphicon glyphicon-trash"></span></a></td></tr>'
+                                );
+                            } else {
+                                $('#tblObservacion').append(
+                                    '<tr><td class="hidden">' + this.codObservacion + '</td><td width=700>' + this.descripcion + '</td><td>' + this.usuario + '</td><td class="hidden">' + this.tipoObservacion + '</td><td>' + this.fecha + '</td></tr>'
+                                );
+                            }
+
+                        });
+                        $('#divObservacion').append('</table>');
+                    }
+                });
+            }
+            function obtenerEstado() {
+                $.ajax({
+                    type: "POST",
+                    url: '/cupon/getEstadoPantalla',
+                    success: function (data) {
+                        if (data.salida.retorno >= 1) {
+                            $(".contenedor").find('input, textarea, button, span, td, a').removeClass('disabled');
+                            $('.glyphicon').fadeIn(2000);
+                            $('#botonera').fadeIn(2000);
+                            asignarTabIndex();
+                            if (ultimoIndex != "") {                                
+                                $('[tabindex=' + ultimoIndex + ']').focus();
+                            } else {
+                                ultimoIndex = 1;
+                                $('[tabindex=' + ultimoIndex + ']').focus();
+                                tabindex = ultimoIndex;
+                            }
+                            
+                        }
+                        else {
+                            $(".contenedor").find('input, textarea, button, span, td, a').addClass('disabled');
+                            $('.glyphicon').slideUp();
+                            $('#botonera').slideUp();
+                        }
+                        cargarObservaciones();
+                    }
+                });
+            }
+
+            function abrirVentana() {
+                $.ajax({
+                    type: "POST",
+                    url: '/cupon/abrirPantallaUV',
+                    success: function (data) {
+                        if (data.salida.retorno >= 1) {
+                            obtenerEstado();     
+                            ultimoIndex = 1;
+                            $('[tabindex=' + ultimoIndex + ']').focus();
+                        }
+                        else {
+                            obtenerEstado();
+                            $.notify(data.salida.mensaje, "warn");
+                        }
+                    }
+                });                
+            }
+            function cerrarVentana() {
+                $.ajax({
+                    type: "POST",
+                    url: '/cupon/cerrarPantallaUV',
+                    success: function (data) {
+                        if (data.salida.retorno >= 1) {
+                            obtenerEstado();
+                        }
+                        else {
+                            $.notify(data.salida.mensaje, "warn");
+                            obtenerEstado();
+                        }
+                    }
+                });
+            }
+            $("#btnAbrir").on('click', function () {
+                abrirVentana();
+            });
+            $("#btnFinalizar").on('click', function () {
+                cerrarVentana();
+            });
+
+
+            var ultimoIndex = "";
+            var tabindex = "";
+            var btnValidar;
+
+            function asignarTabIndex() {
+                btnValidar = document.getElementsByClassName("popup1");
+                //Recorre la lista de elementos 
+                for (var i = 0; i < btnValidar.length; i++) {
+                    var valorIndex = i + 1;
+                    btnValidar[i].setAttribute("tabIndex", valorIndex);
+                }
+            }      
+
+            
+            $(document).on('keydown', function (tecla) {
+                if (tecla.keyCode == 9)
+                {
+                    if (ultimoIndex == "") {
+                        ultimoIndex = 1;
+                        $('[tabindex=' + ultimoIndex + ']').focus();
+                    } else {
+                        $('[tabindex=' + ultimoIndex + ']').focus();
+                    }
+                    tabindex = ultimoIndex;
+                    while (tabindex < btnValidar.length) {
+                        tabindex++; //increment tabindex
+                        ultimoIndex = tabindex;
+                        $('[tabindex=' + ultimoIndex + ']').focus();
+                        obtenerEstado();
+                        return false;
+                    }
+                    if (tabindex == btnValidar.length) {
+                        ultimoIndex = "";
+                        obtenerEstado();
+                    }
+                    
+                }
+            });
+            
+        });
+        
+
+    </script>
+}

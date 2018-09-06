@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C342AAD5-93F6-45E0-A524-06276EFBAACB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Datos</RootNamespace>
+    <AssemblyName>Datos</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MySql.Data, Version=6.9.12.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.6.9.12\lib\net45\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="conexionBD.cs" />
+    <Compile Include="dDashboard.cs" />
+    <Compile Include="dAutenticacion.cs" />
+    <Compile Include="dBanco.cs" />
+    <Compile Include="dDepartamento.cs" />
+    <Compile Include="dDoctoCxP.cs" />
+    <Compile Include="dEmisorTC.cs" />
+    <Compile Include="dEmpleado.cs" />
+    <Compile Include="dEmpresa.cs" />
+    <Compile Include="dEntorno.cs" />
+    <Compile Include="dDoctoOtros.cs" />
+    <Compile Include="dFacturaCajaChica.cs" />
+    <Compile Include="dFacturaCupon.cs" />
+    <Compile Include="dInformeDBR.cs" />
+    <Compile Include="dLibreria.cs" />
+    <Compile Include="dMovimientoPagoCC.cs" />
+    <Compile Include="dMovimientoEfectivo.cs" />
+    <Compile Include="dMovimientoPagoTC.cs" />
+    <Compile Include="dMovimientoTC.cs" />
+    <Compile Include="dMunicipio.cs" />
+    <Compile Include="dObservacionUV.cs" />
+    <Compile Include="dPais.cs" />
+    <Compile Include="dPantalla.cs" />
+    <Compile Include="dPresupuesto.cs" />
+    <Compile Include="dProveedor.cs" />
+    <Compile Include="dPuesto.cs" />
+    <Compile Include="dSucursal.cs" />
+    <Compile Include="dSystem.cs" />
+    <Compile Include="dTipoBaja.cs" />
+    <Compile Include="dTipoPresupuesto.cs" />
+    <Compile Include="dTrasladoEmpleado.cs" />
+    <Compile Include="dUsuario.cs" />
+    <Compile Include="dArea.cs" />
+    <Compile Include="dCupon.cs" />
+    <Compile Include="dEstadoDepartamento.cs" />
+    <Compile Include="dVerificacion.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Entidades\Entidades.csproj">
+      <Project>{4a364181-a7e4-4f02-8b29-1cfc3e26ff11}</Project>
+      <Name>Entidades</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

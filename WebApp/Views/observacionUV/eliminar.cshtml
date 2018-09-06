@@ -1,0 +1,17 @@
+﻿@model Entidades.eObservacionUV
+
+@using (Html.BeginForm("eliminarObservacion", "observacionUV", FormMethod.Post, new { id = "popupForm" }))
+{
+    
+<div class="form-horizontal">
+    <h2>¿Desea eliminar la observación?</h2>
+    <br />
+    <hr />
+    @Html.EditorFor(model => model.codObservacion, new { htmlAttributes = new { @class = "hidden" } })
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="eliminar" class="btn btn-danger" />
+        </div>
+    </div>
+</div>
+}

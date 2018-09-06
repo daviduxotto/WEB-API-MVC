@@ -1,0 +1,376 @@
+﻿@model List<Entidades.eMovimientoEfectivoDet>
+@{
+    ViewBag.Title = "Movimiento de Efectivo";
+}
+<style>
+    .left {
+        text-align: left;
+    }
+
+    .right {
+        text-align: right;
+    }
+
+    .center {
+        text-align: center;
+    }
+
+    .disabled {
+        color: grey;
+    }
+</style>
+
+<h3>Movimiento de Venta Diaria en Efectivo </h3>
+<input type="button" value="Iniciar Validación" class="col-md-3 btn btn-primary" id="btnAbrir" />
+<br />
+<br />
+
+<div class="contenedor">
+    <table class="table table-bordered bg-info">
+        <tbody>
+            <tr>
+                <th class="input-sm" scope="row">Empresa: @ViewBag.empresa</th>
+                <th class="input-sm" scope="row">Sucursal: @ViewBag.estacion</th>
+                <th class="input-sm" scope="row">Fecha: @Convert.ToDateTime(@ViewBag.dia).ToShortDateString()</th>
+
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="tablecontainer">
+
+        <table id="tablaMovimiento" class="table table-striped  table">
+
+            <thead class="bg-info">
+                <tr>
+                    <th class="">COD.</th>
+                    <th>BANCO</th>
+                    <th>COD</th>
+                    <th>CUENTA</th>
+                    <th class="hidden"></th>
+                    <th>T. DOCUMENTO</th>
+                    <th>No. DOCUMENTO</th>
+                    <th>U. BOLSA</th>
+                    <th>MONTO</th>
+                    <th>CONCI.</th>
+                    <th>REVER.</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+
+        <div id="divResultado">
+
+        </div>
+        <div id="botonera">
+            <input type="button" value="Finalizar Validación" class="col-md-3 btn btn-danger" id="btnFinalizar" />
+            @Html.ActionLink("Agregar Depósito", "nuevo", "movimientoefectivo", "", new { @class = "popup btn btn-primary" })
+        </div>
+        <hr />
+        <h3>Observaciones</h3>
+        @Html.ActionLink("Agregar Observación", "nuevaObservacion", "observacionUV", new { pantalla = "02" }, new { @class = "popup btn btn-primary" })
+        @Html.ActionLink("Informe de observaciones", "verInformeObservacionPantalla", "observacionUV", new { pantalla = "02" }, new { @class = "btn btn-primary" })
+        <br />
+    </div>
+    <div id="divObservacion" class="tablecontainer">
+
+    </div>
+    <hr />
+</div>
+
+
+<div>
+    @Html.ActionLink("Salir", "index", "home", "", new { @class = "btn btn-danger" })
+    @Html.ActionLink("Retroceder", "edit", "informedbr", "", new { @class = "btn btn-primary" })
+    @Html.Partial("btnUV")
+    @Html.ActionLink("Avanzar", "edit", "movimientotc", "", new { @class = "btn btn-primary" })
+</div>
+
+@section scripts
+{
+    <script src="~/Scripts/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+            cargarTotales();
+            cargarObservaciones();
+            obtenerEstado();
+            var oTable = $('#tablaMovimiento').DataTable(
+                {
+                    "searching": false,
+                    "paging": false,
+                    language: {
+                        decimal: ",",
+                        processing: "Procesando...",
+                        search: "Buscar:",
+                        lengthMenu: "",
+                        info: "",
+                        infoEmpty: "",
+                        infoFiltered: "",
+                        infoPostFix: "",
+                        loadingRecords: "",
+                        zeroRecords: "",
+                        emptyTable: "",
+                        paginate: {
+                            first: "Primero",
+                            previous: "Anterior",
+                            next: "Siguiente",
+                            last: "Ultimo"
+                        },
+                        aria: {
+                            sortAscending: ": activer pour trier la colonne par ordre croissant",
+                            sortDescending: ": activer pour trier la colonne par ordre décroissant"
+                        }
+                    },
+                    "ajax": {
+                        "url": '/movimientoefectivo/getmovimientoefectivo',
+                        "type": "get",
+                        "datatype": "json"
+                    },
+                    "columns": [
+                        { "data": "codBanco", width: 5 },
+                        { "data": "descBanco", width: 200 },
+                        { "data": "codCuenta", "autoWidth": true },
+                        { "data": "descCuenta", width: 400 },
+                        { "data": "codDoctoBanco", "autoWidth": true, "class": "hidden" },
+                        { "data": "descDoctoBanco", "autoWidth": true },
+                        { "data": "codDocumento", "autoWidth": true },
+                        { "data": "codUnidadBolsa", "autoWidth": true },
+                        { "data": "monto", "autoWidth": true, "className": "right", "type": "numeric-comma", targets: 3 },
+                        {
+                            "data": "conciliado", "width": "10", "render": function (data, type, full) {
+                                if (data == true) {
+                                    return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Desconciliación"  href="/movimientoefectivo/conciliar/1?banco=' + full.codBanco + '&cuenta=' + full.codCuenta + '&doctobanco=' + full.codDoctoBanco + '&documento=' + full.codDocumento.replace(' ', '*') + '"> <span class="glyphicon glyphicon-record"></span></a>';
+                                }
+                                else {
+                                    return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Conciliar"  href="/movimientoefectivo/conciliar/1?banco=' + full.codBanco + '&cuenta=' + full.codCuenta + '&doctobanco=' + full.codDoctoBanco + '&documento=' + full.codDocumento.replace(' ', '*') + '"> <span class="glyphicon glyphicon-unchecked"></span></a>';
+                                }
+
+                            }, className: "center"
+                        },
+                        {
+                            "data": "revertido", "width": "10", "render": function (data, type, full) {
+                                if (data == true) {
+                                    return '<a  class="popup" data-toggle="tooltip" data-placement="top" title="Revertido"  href="/movimientoefectivo/reversar/1?banco=' + full.codBanco + '&cuenta=' + full.codCuenta + '&doctobanco=' + full.codDoctoBanco + '&documento=' + full.codDocumento.replace(' ', '*') + '"> <span class="glyphicon glyphicon-record"></span></a>';
+                                }
+                                else {
+                                    return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Revertir"  href="/movimientoefectivo/reversar/1?banco=' + full.codBanco + '&cuenta=' + full.codCuenta + '&doctobanco=' + full.codDoctoBanco + '&documento=' + full.codDocumento.replace(' ', '*') + '"> <span class="glyphicon glyphicon-unchecked"></span></a>';
+                                }
+
+                            }, className: "center"
+                        },
+                        {
+                            "data": "descBanco", "width": "10", "render": function (data, type, full) {
+                                return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Cambiar el Codigo del Documento"  href="/movimientoefectivo/cambiocodigo/1?banco=' + full.codBanco + '&cuenta=' + full.codCuenta + '&doctobanco=' + full.codDoctoBanco + '&documento=' + full.codDocumento.replace(' ', '*') + '"> <span class="glyphicon glyphicon-list-alt"></span></a>';
+                            }
+                        },
+                        {
+                            "data": "descBanco", "width": "10", "render": function (data, type, full) {
+                                return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Cambiar el Monto del Documento"  href="/movimientoefectivo/cambiomonto/1?banco=' + full.codBanco + '&cuenta=' + full.codCuenta + '&doctobanco=' + full.codDoctoBanco + '&documento=' + full.codDocumento.replace(' ', '*') + '&monto=' + full.monto + '"> <span class="glyphicon glyphicon-usd"></span></a>';
+                            }
+                        },
+                        {
+                            "data": "descBanco", "width": "10", "render": function (data, type, full) {
+                                return '<a class="popup" data-toggle="tooltip" data-placement="top" title="Eliminar  Documento"  href="/movimientoefectivo/eliminar/1?banco=' + full.codBanco + '&cuenta=' + full.codCuenta + '&doctobanco=' + full.codDoctoBanco + '&documento=' + full.codDocumento.replace(' ', '*') + '"> <span class="glyphicon glyphicon-trash"></span></a>';
+                            }
+                        }
+                    ], "initComplete": function (settings, json) {
+                        obtenerEstado();
+                    }
+                });
+
+            // -- Eventos Clicks
+            // -- Boton con Vista Parcial
+            $('.tablecontainer').on('click', 'a.popup', function (e) {
+                e.preventDefault();
+                OpenPopup($(this).attr('href'));
+                obtenerEstado();
+            })
+
+            // -- Boton sin Vista
+            $('.tablecontainer').on('click', 'a.popup1', function (e) {
+                e.preventDefault();
+                var url = $(this).attr('href')
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    success: function (data) {
+                        if (data.status) {
+                            oTable.ajax.reload();
+                            cargarTotales();
+                        }
+                        obtenerEstado();
+                    }
+                })
+            })
+
+            // --Popup
+            function OpenPopup(pageUrl) {
+                var $pageContent = $('<div/>');
+                $pageContent.load(pageUrl, function () {
+                });
+                // -- Abrir Dialogo
+                $dialog = $('<div class="popupWindow" style="overflow:auto"></div>')
+                    .html($pageContent)
+                    .dialog(
+                    {
+                        draggable: true,
+                        autoOpen: false,
+                        resizable: false,
+                        model: true,
+                        title: '',
+                        height: 'auto',
+                        width: 600,
+                        close: function () {
+                            $dialog.dialog('destroy').remove();
+                        }
+                    })
+                // -- Enviar Formulario
+                $('.popupWindow').on('submit', '#popupForm', function (e) {
+                    var url = $('#popupForm')[0].action;
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: $('#popupForm').serialize(),
+                        success: function (data) {
+                            if (data.salida.retorno >= 1) {
+                                $dialog.dialog('close');
+                                oTable.ajax.reload();
+                                cargarTotales();
+                                cargarObservaciones();
+
+                            } else {
+                                $.notify(data.salida.mensaje, "warn");
+                            }
+                            obtenerEstado();
+                        }
+                    })
+                    e.preventDefault();
+                })
+                $dialog.dialog('open');
+            }
+
+            function cargarTotales() {
+                $.ajax({
+                    type: "POST",
+                    url: '/movimientoefectivo/getLiquidacionVtaDiariaxEmpreEfectivo',
+                    success: function (data) {
+                        $('#divResultado').empty();
+                        $('#divResultado').append('<table class="table table-bordered  ">'
+                            +
+                            '<tr><th>Total Reportado</th><th>Total Documentos</th><th>Diferencia</th></tr>' +
+                            '<tr><th> Q. ' + data.montoTotalReportado + '</th><th>Q. ' + data.montoTotalDocumentos + '</th><th> Q. ' + data.diferenciaMontoDocto + '</th></tr>'
+                            +
+                            '</table>'
+                        );
+                        $('#divResultado').append(
+                            '<table class="table table-bordered">'
+                            +
+                            '<tr><th>Total Reportado</th><th>Total Conciliado</th><th>Diferencia</th></tr>' +
+                            '<tr><th>Q. ' + data.montoTotalReportado + '</th><th>Q. ' + data.montoTotalConciliado + '</th><th>Q. ' + data.diferenciaMontoConciliado + '</th></tr>'
+                            +
+                            '</table>'
+                        );
+                    }
+                })
+            }
+            function cargarObservaciones() {
+                $.ajax({
+                    type: "POST",
+                    url: '/observacionUV/getObservacionUV/id=1?codPantalla=02',
+                    success: function (data) {
+                        $('#divObservacion').empty();
+                        $('#divObservacion').append('<table class="table table-bordered" id="tblObservacion">'
+                            +
+                            '<tr><th class="hidden">Codigo</th><th width=700>Descripción</th><th>Usuario</th><th class="hidden">Tipo</th><th>Fecha</th><th>Acción</th></tr>'
+                        );
+                        $.each(data, function () {
+                            if (this.tipoObservacion == "M") {
+                                $('#tblObservacion').append(
+                                    '<tr><td class="hidden">' + this.codObservacion + '</td><td width=700>' + this.descripcion + '</td><td>' + this.usuario + '</td><td class="hidden">' + this.tipoObservacion + '</td><td>' + this.fecha + '</td><td><a class="popup" data-toggle="tooltip" data-placement="top" title="Eliminar Observación"  href="/observacionUV/eliminar/1?codObservacion=' + this.codObservacion + '"> <span class="glyphicon glyphicon-trash"></span></a></td></tr>'
+                                );
+                            } else {
+                                $('#tblObservacion').append(
+                                    '<tr><td class="hidden">' + this.codObservacion + '</td><td width=700>' + this.descripcion + '</td><td>' + this.usuario + '</td><td class="hidden">' + this.tipoObservacion + '</td><td>' + this.fecha + '</td></tr>'
+                                );
+                            }
+
+                        });
+                        $('#divObservacion').append('</table>');
+                    }
+                })
+            }
+            $(function () {
+                $("#datepicker").datepicker({ dateFormat: "dd/mm/yy" }).val()
+            });
+
+
+            function obtenerEstado() {
+                $.ajax({
+                    type: "POST",
+                    url: '/movimientoefectivo/getEstadoPantalla',
+                    success: function (data) {
+                        if (data.salida.retorno >= 1) {
+                            $(".contenedor").find('input, textarea, button, span, td, a').removeClass('disabled');
+                            $('.glyphicon').fadeIn(2000);
+                            $('#botonera').fadeIn(2000);
+                        }
+                        else {
+                           $(".contenedor").find('input, textarea, button, span, td, a').addClass('disabled');
+                           $('.glyphicon').slideUp();
+                           $('#botonera').slideUp();
+                        }
+                        cargarObservaciones();
+                    }
+                });
+            }
+            function abrirVentana() {
+                $.ajax({
+                    type: "POST",
+                    url: '/movimientoefectivo/abrirPantallaUV',
+                    success: function (data) {
+                        if (data.salida.retorno >= 1) {
+                            obtenerEstado();
+                        }
+                        else {
+                            obtenerEstado();
+                            $.notify(data.salida.mensaje, "warn");
+                        }
+                    }
+                })
+            }
+            function cerrarVentana() {
+                $.ajax({
+                    type: "POST",
+                    url: '/movimientoefectivo/cerrarPantallaUV',
+                    success: function (data) {
+                        if (data.salida.retorno >= 1) {
+                            $.notify(data.salida.mensaje, "info");
+                            obtenerEstado();
+                        }
+                        else {
+                            $.notify(data.salida.mensaje, "warn");
+                        }
+                    }
+                });
+            }
+          
+            $("#btnAbrir").on('click', function () {
+                abrirVentana();
+            });
+
+            $("#btnFinalizar").on('click', function () {
+                cerrarVentana();
+            });
+
+        });
+      
+
+    </script>
+
+}

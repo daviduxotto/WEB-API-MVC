@@ -1,0 +1,162 @@
+﻿@model  Entidades.ePresupuesto
+
+<div class="container">
+
+    @using (Html.BeginForm("VerInformePresupuestoOpexxArea", "presupuesto", FormMethod.Post))
+    {
+    @Html.AntiForgeryToken()
+
+    <h4>Informe de Presupuesto por Area</h4>
+    <div class="form-horizontal">
+        <div class="form-group">
+            <label class="control-label col-md-2">Año</label>
+            <div class="col-md-2">
+                <label class="control-label col-md-2">@Session["aniopresupuesto"].ToString()</label>
+                @Html.EditorFor(m => m.anio, new { htmlAttributes = new { @Value = @Session["aniopresupuesto"].ToString(), @class = "hidden" } })
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2" for="empresa">Empresa</label>
+            <div class="col-md-4">
+
+                @Html.DropDownListFor(m => m.empresa, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="estacion">Unidad de Negocio</label>
+            <div class="col-md-4">
+                @Html.DropDownListFor(m => m.estacion, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control col-md-4" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="tipoPresupuesto">Tipo de Presupuesto</label>
+            <div class="col-md-4">
+                @Html.DropDownListFor(m => m.tipoPresupuesto, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control col-md-4" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="area">Area</label>
+            <div class="col-md-4">
+                @Html.DropDownListFor(m => m.area, Enumerable.Empty<SelectListItem>(), htmlAttributes: new { @class = "form-control col-md-4" })
+            </div>
+        </div>
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="control-label col-md-2" for="formatoInforme" style="text-align:right">Formato</label>
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.formatoInforme, new List<SelectListItem> { new SelectListItem { Text = "PDF", Value = "PDF" }, new SelectListItem { Text = "EXCEL", Value = "EXCEL" } }, htmlAttributes: new { @class = "form-control col-md-4" })
+                </div>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-4">
+                <input type="submit" value="Imprimir" class="btn btn-primary" />
+                @Html.ActionLink("Regresar", "index", "home", "", new { @class = "btn btn-danger" })
+            </div>
+        </div>
+    </div>
+    }
+
+</div>
+
+@section scripts
+{
+
+    <script>
+        $(document).ready(function () {
+            // ----- obtener empresas
+            $.getJSON('/presupuesto/getEmpresas', null, function (data) {
+                $.each(data, function () {
+                    $('#empresa').append('<option value=' +
+                      this.codigo + '>' + this.descripcion + '</option>');
+                });
+                // ----- obtener sucursales
+               $.getJSON('/presupuesto/getSucursales', { codEmpresa: $('#empresa').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#estacion').append('<option value=' +
+                          this.codigoSucursal + '>' + this.descripcion+ '</option>');
+                    });
+                   // ----- obtener area por unidad de negocio              
+                    $.getJSON('/presupuesto/getareaxunidadnegocio', { codEmpresa: $('#empresa').val(), codSucursal: $('#estacion').val() }, function (data) {
+                        $.each(data, function () {
+                            $('#area').append('<option value=' +
+                              this.codigo + '>' + this.descripcion + '</option>');
+                        });
+                   
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error al obtener area!');
+                    }); // -- fin obtener area
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener sucursales');
+                });
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert('Error al obtener Empresas!');
+            });
+            // ------ fin de carga inicial --------------------------------------------------------------------------
+
+            // ------ obtener sucursales cuando la empresa cambie
+            $('#empresa').change(function () {
+                $('#estacion option').remove();
+                $.getJSON('/presupuesto/getSucursales', { codEmpresa: $('#empresa').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#estacion').append('<option value=' +
+                          this.codigoSucursal + '>' + this.descripcion + '</option>');
+                    });
+                    $('#area option').remove();
+                    // ----- obtener area por unidad de negocio              
+                    $.getJSON('/presupuesto/getareaxunidadnegocio', { codEmpresa: $('#empresa').val(), codSucursal: $('#estacion').val() }, function (data) {
+                        console.log('cambio de empresa y añadir area');
+                        $.each(data, function () {
+                            $('#area').append('<option value=' +
+                              this.codigo + '>' + this.descripcion + '</option>');
+                        });
+                 
+                    
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error al obtener area!');
+                    }); // -- fin obtener area
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener sucursales');
+                });
+            });
+   
+            // ------ obtener area cuando la sucursal cambie
+            $('#estacion').change(function () {
+                $('#area option').remove();
+                console.log('cambio la estacuib');
+                $.getJSON('/presupuesto/getareaxunidadnegocio', { codEmpresa: $('#empresa').val(), codSucursal: $('#estacion').val() }, function (data) {
+                    $.each(data, function () {
+                    
+                        $('#area').append('<option value=' +
+                          this.codigo + '>' + this.descripcion + '</option>');
+                    });
+         
+             
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error al obtener area');
+                });
+            });
+
+  
+
+            // ----- obtener tipo de presupuesto
+            $.getJSON('/presupuesto/getTipoPresupuesto', null, function (data) {
+                $.each(data, function () {
+                    $('#tipoPresupuesto').append('<option value=' +
+                      this.codigo + '>' + this.codigo + '</option>');
+                });               
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert('Error al obtener tipo de presupuestos!');
+            });
+
+         
+        });
+    </script>
+}
